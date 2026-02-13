@@ -252,12 +252,12 @@
     <div class="controls direction-select">
         <span class="label-main">方法：</span>
         <div class="direction-option">
-            <input type="radio" id="algoSelection" name="algorithm" value="selection" checked>
-            <label for="algoSelection">選択法（最後に交換）</label>
-        </div>
-        <div class="direction-option">
             <input type="radio" id="algoExchange" name="algorithm" value="exchange">
             <label for="algoExchange">交換法（毎回交換）</label>
+        </div>
+        <div class="direction-option">
+            <input type="radio" id="algoSelection" name="algorithm" value="selection" checked>
+            <label for="algoSelection">選択法（最後に交換）</label>
         </div>
     </div>
 
@@ -960,6 +960,22 @@
         prepareBtn.addEventListener("click", prepare);
         nextBtn.addEventListener("click", nextStep);
         resetBtn.addEventListener("click", reset);
+
+        // Index Box visibility toggle
+        function updateIndexBoxVisibility() {
+            const indexArea = document.getElementById("indexArea");
+            if (algoSelectionRadio.checked) {
+                indexArea.style.visibility = "visible";
+            } else {
+                indexArea.style.visibility = "hidden";
+            }
+        }
+
+        algoSelectionRadio.addEventListener("change", updateIndexBoxVisibility);
+        algoExchangeRadio.addEventListener("change", updateIndexBoxVisibility);
+
+        // Initial call
+        updateIndexBoxVisibility();
 
     </script>
 
