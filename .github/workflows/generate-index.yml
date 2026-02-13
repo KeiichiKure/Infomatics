@@ -19,13 +19,109 @@ jobs:
 
       - name: index.html を生成
         run: |
-          echo "<html><body><h1>ページ一覧</h1><ul>" > index.html
+          cat <<EOF > index.html
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Webアプリ一覧</title>
+              <style>
+                  :root {
+                      --primary-color: #2563eb;
+                      --bg-color: #f8fafc;
+                      --card-bg: #ffffff;
+                      --text-color: #1e293b;
+                      --text-muted: #64748b;
+                  }
+                  body {
+                      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+                      background-color: var(--bg-color);
+                      margin: 0;
+                      padding: 40px 20px;
+                      color: var(--text-color);
+                      line-height: 1.6;
+                  }
+                  .container {
+                      max-width: 800px;
+                      margin: 0 auto;
+                  }
+                  header {
+                      margin-bottom: 40px;
+                      text-align: center;
+                  }
+                  h1 {
+                      font-size: 2.5rem;
+                      color: var(--primary-color);
+                      margin: 0;
+                      font-weight: 800;
+                  }
+                  .grid {
+                      display: grid;
+                      gap: 20px;
+                  }
+                  .card {
+                      background: var(--card-bg);
+                      padding: 24px;
+                      border-radius: 12px;
+                      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+                      transition: transform 0.2s, box-shadow 0.2s;
+                      text-decoration: none;
+                      color: inherit;
+                      display: block;
+                      border: 1px solid #e2e8f0;
+                  }
+                  .card:hover {
+                      transform: translateY(-2px);
+                      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+                      border-color: var(--primary-color);
+                  }
+                  .card-title {
+                      font-size: 1.25rem;
+                      font-weight: 700;
+                      color: var(--primary-color);
+                      margin-bottom: 8px;
+                      display: block;
+                  }
+                  .card-filename {
+                      font-size: 0.875rem;
+                      color: var(--text-muted);
+                      font-family: monospace;
+                  }
+                  @media (max-width: 640px) {
+                      body { padding: 20px 15px; }
+                      h1 { font-size: 1.8rem; }
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <header>
+                      <h1>Webアプリ一覧</h1>
+                  </header>
+                  <main class="grid">
+          EOF
+
           for file in *.html; do
             if [ "$file" != "index.html" ]; then
-              echo "<li><a href=\"$file\">$file</a></li>" >> index.html
+              # titleタグの中身を抽出。見つからない場合はファイル名をタイトルにする。
+              title=$(sed -n 's/.*<title>\(.*\)<\/title>.*/\1/p' "$file" | head -n 1)
+              if [ -z "$title" ]; then
+                title="$file"
+              fi
+              echo "        <a href=\"$file\" class=\"card\">" >> index.html
+              echo "            <span class=\"card-title\">$title</span>" >> index.html
+              echo "            <span class=\"card-filename\">$file</span>" >> index.html
+              echo "        </a>" >> index.html
             fi
           done
-          echo "</ul></body></html>" >> index.html
+
+          cat <<EOF >> index.html
+                  </main>
+              </div>
+          </body>
+          </html>
+          EOF
 
       - name: 変更をコミットしてプッシュ
         run: |
