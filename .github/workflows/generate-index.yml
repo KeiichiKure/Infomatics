@@ -3,8 +3,8 @@ name: Generate index.html
 on:
   push:
     branches:
-      - main  # または使用しているブランチ名
-  workflow_dispatch:  # 手動実行も可能にする
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,4 +31,3 @@ jobs:
           git add index.html
           git commit -m "自動生成された index.html を追加"
           git push
-
