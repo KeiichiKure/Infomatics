@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>バブルソートシミュレーション（統合版）</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .controls {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .controls input {
+            width: 260px;
+            padding: 6px;
+            font-size: 1.1rem;
+        }
+
+        .controls button {
+            padding: 6px 14px;
+            margin-left: 6px;
+            font-size: 1.1rem;
+        }
+
+        .controls select {
+            padding: 6px;
+            font-size: 1.1rem;
+            margin-left: 10px;
+        }
+
+        /* 新しい選択ボックスのスタイル */
+        .direction-select {
+            margin: 15px auto;
+            padding: 15px 20px;
+            background: #fff;
+            border-radius: 10px;
+            border: 2px solid #4fc3f7;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .direction-select .label-main {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .direction-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .direction-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .direction-option label {
+            font-size: 1.15rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* ★ メインレイアウト：左に説明、中央に棒グラフ、右にログ */
+        #mainArea {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        /* 左側の説明パネル */
+        #leftColumn {
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 12px;
+            font-size: 1.1rem;
+            min-height: 120px;
+        }
+
+        .panel h3 {
+            margin: 0 0 6px;
+            font-size: 1.3rem;
+        }
+
+        /* 中央の棒グラフ */
+        #centerColumn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #chart {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 25px;
+            height: 350px;
+            margin: 30px 0 10px 0;
+            position: relative;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bar {
+            width: 80px;
+            background: #4fc3f7;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.4rem;
+            transition: height 0.4s ease, background 0.3s;
+            position: relative;
+        }
+
+        .index-label {
+            margin-top: 6px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .compare {
+            background: #ffb74d !important;
+        }
+
+        .sorted {
+            background: #81c784 !important;
+        }
+
+        /* ゴースト棒 */
+        .ghost {
+            position: fixed;
+            width: 80px;
+            background: #f06292;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.4rem;
+            pointer-events: none;
+            transition: transform 0.6s ease;
+            z-index: 1000;
+        }
+
+        /* temp の箱（棒グラフの下） */
+        #tempArea {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #tempBox {
+            width: 140px;
+            height: 140px;
+            border: 4px dashed #333;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        /* 右側のログ */
+        #rightColumn {
+            width: 260px;
+        }
+
+        #log {
+            background: white;
+            padding: 12px;
+            border: 1px solid #ccc;
+            height: 350px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 1rem;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>バブルソートシミュレーション（統合版）</h1>
+
+    <div class="controls">
+        <input id="inputArray" type="text" value="5,3,8,4,2">
+        <button id="prepareBtn">準備</button>
+        <button id="nextBtn" disabled>次のステップ</button>
+        <button id="resetBtn">リセット</button>
+
+        <!-- ★ 昇順・降順選択 -->
+        <select id="orderSelect">
+            <option value="asc">昇順（小さい順）</option>
+            <option value="desc">降順（大きい順）</option>
+        </select>
+    </div>
+
+    <!-- ★ 確定方向の選択（改善版） -->
+    <div class="controls direction-select">
+        <span class="label-main">確定方向：</span>
+        <div class="direction-option">
+            <input type="radio" id="directionRight" name="direction" value="right" checked>
+            <label for="directionRight">右端から確定</label>
+        </div>
+        <div class="direction-option">
+            <input type="radio" id="directionLeft" name="direction" value="left">
+            <label for="directionLeft">左端から確定</label>
+        </div>
+    </div>
+
+    <div id="mainArea">
+
+        <!-- 左側：説明パネル -->
+        <div id="leftColumn">
+            <div class="panel">
+                <h3>これからやること</h3>
+                <div id="nextAction">「準備」を押してください。</div>
+            </div>
+
+            <div class="panel">
+                <h3>今やったこと</h3>
+                <div id="currentAction">まだ何もしていません。</div>
+            </div>
+        </div>
+
+        <!-- 中央：棒グラフ＋temp -->
+        <div id="centerColumn">
+            <div id="chart"></div>
+
+            <div id="tempArea">
+                <h3>temp（仮置きの箱）</h3>
+                <div id="tempBox">空</div>
+            </div>
+        </div>
+
+        <!-- 右側：ログ -->
+        <div id="rightColumn">
+            <h3>ログ</h3>
+            <div id="log"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const inputEl = document.getElementById("inputArray");
+        const prepareBtn = document.getElementById("prepareBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const orderSelect = document.getElementById("orderSelect");
+        const directionRightRadio = document.getElementById("directionRight");
+        const directionLeftRadio = document.getElementById("directionLeft");
+
+        const chartEl = document.getElementById("chart");
+        const tempBox = document.getElementById("tempBox");
+        const nextActionEl = document.getElementById("nextAction");
+        const currentActionEl = document.getElementById("currentAction");
+        const logEl = document.getElementById("log");
+
+        let arr = [];
+        let bars = [];
+        let wrappers = [];
+        let i = 0, j = 0;
+        let n = 0;
+        let sortedBoundary = 0;
+        let finished = false;
+        let direction = "right"; // "right" or "left"
+
+        let phase = "idle";
+        let needSwap = false;
+        let tempValue = null;
+
+        // ★ 数値の大きさによって棒の長さを調整するための係数
+        let currentBarUnit = 40;
+
+        let tempGhost = null;
+        let rightGhost = null;
+
+        function log(msg) {
+            logEl.textContent += msg + "\n";
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function renderBars() {
+            chartEl.innerHTML = "";
+            bars = [];
+            wrappers = [];
+
+            // 最大値を求めて、高さを自動調整 (最大300px程度に収める)
+            // 数値が9のときを基準(=約360pxくらいだったが、300pxに収めるなら 300/9 ≒ 33)
+            // ユーザー要望：9の長さを最大とする → 9以上の値が来ても枠内に収める
+            const maxVal = Math.max(...arr, 9);
+            // 300px を最大とする
+            const maxPx = 300;
+            currentBarUnit = maxPx / maxVal;
+
+            arr.forEach((v, idx) => {
+                const wrapper = document.createElement("div");
+                wrapper.className = "bar-wrapper";
+
+                const bar = document.createElement("div");
+                bar.className = "bar";
+                bar.style.height = (v * currentBarUnit) + "px";
+                bar.textContent = v;
+
+                // 確定済みの判定を方向に応じて変更
+                if (direction === "right") {
+                    if (idx >= n - sortedBoundary) bar.classList.add("sorted");
+                } else {
+                    if (idx < sortedBoundary) bar.classList.add("sorted");
+                }
+
+                const label = document.createElement("div");
+                label.className = "index-label";
+                label.textContent = idx;
+
+                wrapper.appendChild(bar);
+                wrapper.appendChild(label);
+
+                chartEl.appendChild(wrapper);
+
+                bars.push(bar);
+                wrappers.push(wrapper);
+            });
+        }
+
+        function highlight(i1, i2) {
+            bars.forEach(b => b.classList.remove("compare"));
+            bars[i1].classList.add("compare");
+            bars[i2].classList.add("compare");
+        }
+
+        function clearHighlight() {
+            bars.forEach(b => b.classList.remove("compare"));
+        }
+
+        function createGhost(fromBar, value) {
+            const rect = fromBar.getBoundingClientRect();
+            const ghost = document.createElement("div");
+            ghost.className = "ghost";
+            ghost.style.height = rect.height + "px";
+            ghost.textContent = value;
+            ghost.style.left = rect.left + "px";
+            ghost.style.top = rect.top + "px";
+            document.body.appendChild(ghost);
+            return ghost;
+        }
+
+        /* ★ 添え字の真上に戻す（X＝wrapper中心、Y＝bar上端） - 修正版 */
+        function moveGhostToBar(ghost, wrapper) {
+            // 現在のtransformに依存せず、生成時の座標(style.left, top)を基準に差分を計算する
+            const originX = parseFloat(ghost.style.left);
+            const originY = parseFloat(ghost.style.top);
+
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const bar = wrapper.querySelector('.bar');
+            const barRect = bar.getBoundingClientRect();
+
+            const targetCenterX = wrapperRect.left + wrapperRect.width / 2;
+            const targetTop = barRect.top;
+
+            // ghostの幅はCSSで80px固定だが、念のためoffsetWidthを取得
+            const ghostWidth = ghost.offsetWidth;
+
+            const dx = (targetCenterX - ghostWidth / 2) - originX;
+            const dy = targetTop - originY;
+
+            ghost.style.transform = `translate(${dx}px, ${dy}px)`;
+        }
+
+        function moveGhostToRect(ghost, targetRect) {
+            const g = ghost.getBoundingClientRect();
+
+            const ghostCenterX = g.left + g.width / 2;
+            const ghostCenterY = g.top + g.height / 2;
+
+            const targetCenterX = targetRect.left + targetRect.width / 2;
+            const targetCenterY = targetRect.top + targetRect.height / 2;
+
+            const dx = targetCenterX - ghostCenterX;
+            const dy = targetCenterY - ghostCenterY;
+
+            ghost.style.transform = `translate(${dx}px, ${dy}px)`;
+        }
+
+        function reset() {
+            arr = [];
+            bars = [];
+            wrappers = [];
+            i = j = 0;
+            sortedBoundary = 0;
+            finished = false;
+            phase = "idle";
+            needSwap = false;
+            tempValue = null;
+
+            if (tempGhost) tempGhost.remove();
+            if (rightGhost) rightGhost.remove();
+            tempGhost = null;
+            rightGhost = null;
+
+            chartEl.innerHTML = "";
+            tempBox.textContent = "空";
+            nextActionEl.textContent = "「準備」を押してください。";
+            currentActionEl.textContent = "まだ何もしていません。";
+            logEl.textContent = "";
+            nextBtn.disabled = true;
+        }
+
+        function prepare() {
+            reset();
+            const nums = inputEl.value.split(",").map(s => Number(s.trim()));
+            if (nums.some(isNaN)) {
+                alert("数値をカンマ区切りで入力してください");
+                return;
+            }
+            arr = nums;
+            n = arr.length;
+
+            // 確定方向を取得
+            direction = directionRightRadio.checked ? "right" : "left";
+
+            renderBars();
+            log("準備完了: [" + arr.join(", ") + "]");
+            log("確定方向: " + (direction === "right" ? "右端から確定" : "左端から確定"));
+            log("--- 比較開始 ---");
+
+            i = 0;
+            sortedBoundary = 0;
+
+            if (direction === "right") {
+                // 右端確定：左から右へ走査
+                j = 0;
+                phase = "compare";
+                nextActionEl.textContent = `次：棒 ${j} と ${j + 1} を比較します。`;
+            } else {
+                // 左端確定：右から左へ走査
+                j = n - 1;
+                phase = "compare";
+                nextActionEl.textContent = `次：棒 ${j - 1} と ${j} を比較します。`;
+            }
+
+            nextBtn.disabled = false;
+        }
+
+        function nextStep() {
+            if (finished) return;
+
+            if (direction === "right") {
+                nextStepRight();
+            } else {
+                nextStepLeft();
+            }
+        }
+
+        // 右端確定版のロジック
+        function nextStepRight() {
+            const a = arr[j];
+            const b = arr[j + 1];
+
+            const order = orderSelect.value;
+            needSwap = (order === "asc") ? (a > b) : (a < b);
+
+            if (phase === "compare") {
+                highlight(j, j + 1);
+                currentActionEl.textContent = `比較：${a} と ${b}`;
+                log(`(${j}, ${j + 1}) : ${a} vs ${b}`);
+
+                if (needSwap) {
+                    nextActionEl.textContent = "次：temp = 左の値（左の棒を temp に移動）";
+                    phase = "toTemp";
+                } else {
+                    nextActionEl.textContent = "次：入れ替えはしません。次のペアへ。";
+                    phase = "noSwap";
+                }
+                return;
+            }
+
+            /* temp = 左の値 */
+            if (phase === "toTemp") {
+                tempValue = a;
+                tempBox.textContent = tempValue;
+
+                tempGhost = createGhost(bars[j], a);
+
+                const t = tempBox.getBoundingClientRect();
+                const g = tempGhost.getBoundingClientRect();
+                const dx = (t.left + t.width / 2) - (g.left + g.width / 2);
+                const dy = (t.top + t.height / 2) - (g.top + g.height / 2);
+                tempGhost.style.transform = `translate(${dx}px, ${dy}px)`;
+
+                currentActionEl.textContent = `temp = ${a} として退避しました。`;
+                // log(`  Swap: ${a} <-> ${b}`);
+
+                phase = "copyRightToLeft";
+                nextActionEl.textContent = "次：右の値を左にコピーします。";
+                return;
+            }
+
+            /* 右の値を左へコピー */
+            if (phase === "copyRightToLeft") {
+                rightGhost = createGhost(bars[j + 1], b);
+
+                moveGhostToBar(rightGhost, wrappers[j]);
+
+                setTimeout(() => {
+                    arr[j] = b;
+                    bars[j].style.height = (b * currentBarUnit) + "px";
+                    bars[j].textContent = b;
+                    rightGhost.remove();
+                    rightGhost = null;
+                }, 600);
+
+                currentActionEl.textContent = `a[j] = a[j+1] として左にコピーしました。`;
+                // log(`左に ${b} をコピー`);
+
+                phase = "tempToRight";
+                nextActionEl.textContent = "次：temp の値を右にコピーします。";
+                return;
+            }
+
+            /* temp → 右へコピー */
+            if (phase === "tempToRight") {
+
+                moveGhostToBar(tempGhost, wrappers[j + 1]);
+
+                setTimeout(() => {
+                    arr[j + 1] = tempValue;
+                    bars[j + 1].style.height = (tempValue * currentBarUnit) + "px";
+                    bars[j + 1].textContent = tempValue;
+
+                    tempGhost.remove();
+                    tempGhost = null;
+                }, 600);
+
+                currentActionEl.textContent = `a[j+1] = temp として右にコピーしました。`;
+                // log(`右に temp をコピー → [${arr.join(", ")}]`);
+
+                phase = "advance";
+                nextActionEl.textContent = "次：次のペアへ進みます。";
+                return;
+            }
+
+            /* 入れ替えなし */
+            if (phase === "noSwap") {
+                currentActionEl.textContent = "入れ替えは不要でした。";
+                // log("入れ替えなし");
+                phase = "advance";
+                nextActionEl.textContent = "次：次のペアへ進みます。";
+                return;
+            }
+
+            /* 次のペアへ */
+            if (phase === "advance") {
+                clearHighlight();
+                j++;
+
+                if (j >= n - 1 - i) {
+                    sortedBoundary = i + 1;
+                    // log(`--- パス ${i + 1} 終了（右端 ${n - sortedBoundary} から確定） ---`);
+                    i++;
+                    j = 0;
+
+                    if (i >= n - 1) {
+                        finished = true;
+                        sortedBoundary = n;
+                        renderBars();
+                        currentActionEl.textContent = "ソート完了！";
+                        nextActionEl.textContent = "完了しました。";
+                        log("ソート完了");
+                        return;
+                    }
+                    renderBars();
+                    log(`--- パス ${i + 1} 開始 ---`);
+                }
+
+                phase = "compare";
+                nextActionEl.textContent = `次：棒 ${j} と ${j + 1} を比較します。`;
+                currentActionEl.textContent = "次のペアに進みました。";
+                return;
+            }
+        }
+
+        // 左端確定版のロジック
+        function nextStepLeft() {
+            const leftIndex = j - 1;
+            const rightIndex = j;
+
+            if (leftIndex < 0 || rightIndex <= leftIndex) {
+                phase = "advance";
+            }
+
+            const order = orderSelect.value;
+
+            if (phase === "compare") {
+                const a = arr[leftIndex];
+                const b = arr[rightIndex];
+
+                needSwap = (order === "asc") ? (a > b) : (a < b);
+
+                highlight(leftIndex, rightIndex);
+                currentActionEl.textContent = `比較：${a} と ${b}`;
+                log(`(${leftIndex}, ${rightIndex}) : ${a} vs ${b}`);
+
+                if (needSwap) {
+                    nextActionEl.textContent = "次：temp = 左の値（左の棒を temp に移動）";
+                    phase = "toTemp";
+                } else {
+                    nextActionEl.textContent = "次：入れ替えはしません。次のペアへ。";
+                    phase = "noSwap";
+                }
+                return;
+            }
+
+            if (phase === "toTemp") {
+                const a = arr[leftIndex];
+                tempValue = a;
+                tempBox.textContent = tempValue;
+
+                tempGhost = createGhost(bars[leftIndex], a);
+                moveGhostToRect(tempGhost, tempBox.getBoundingClientRect());
+
+                currentActionEl.textContent = `temp = ${a} として退避しました。`;
+                // log(`  Swap: ${a} <-> ${b}`);
+
+                phase = "copyRightToLeft";
+                nextActionEl.textContent = "次：右の値を左にコピーします。";
+                return;
+            }
+
+            if (phase === "copyRightToLeft") {
+                const b = arr[rightIndex];
+
+                rightGhost = createGhost(bars[rightIndex], b);
+                moveGhostToBar(rightGhost, wrappers[leftIndex]);
+
+                setTimeout(() => {
+                    arr[leftIndex] = b;
+                    bars[leftIndex].style.height = (b * currentBarUnit) + "px";
+                    bars[leftIndex].textContent = b;
+                    rightGhost.remove();
+                    rightGhost = null;
+                }, 600);
+
+                currentActionEl.textContent = `a[${leftIndex}] = a[${rightIndex}] として左にコピーしました。`;
+                // log(`左に ${b} をコピー`);
+
+                phase = "tempToRight";
+                nextActionEl.textContent = "次：temp の値を右にコピーします。";
+                return;
+            }
+
+            if (phase === "tempToRight") {
+                moveGhostToBar(tempGhost, wrappers[rightIndex]);
+
+                setTimeout(() => {
+                    arr[rightIndex] = tempValue;
+                    bars[rightIndex].style.height = (tempValue * currentBarUnit) + "px";
+                    bars[rightIndex].textContent = tempValue;
+
+                    tempGhost.remove();
+                    tempGhost = null;
+                }, 600);
+
+                currentActionEl.textContent = `a[${rightIndex}] = temp として右にコピーしました。`;
+                // log(`右に temp をコピー → [${arr.join(", ")}]`);
+
+                phase = "advance";
+                nextActionEl.textContent = "次：次のペアへ進みます。";
+                return;
+            }
+
+            if (phase === "noSwap") {
+                currentActionEl.textContent = "入れ替えは不要でした。";
+                // log("入れ替えなし");
+                phase = "advance";
+                nextActionEl.textContent = "次：次のペアへ進みます。";
+                return;
+            }
+
+            if (phase === "advance") {
+                clearHighlight();
+                j--; // 右から左へ進む
+
+                // ★ 修正ポイント：j が i+1 未満になったらパス終了
+                if (j < i + 1) {
+                    sortedBoundary = i + 1; // 左端から i まで確定
+                    // log(`--- パス ${i + 1} 終了（左端 ${sortedBoundary - 1} まで確定） ---`);
+                    i++;
+                    if (i >= n - 1) {
+                        finished = true;
+                        sortedBoundary = n;
+                        renderBars();
+                        currentActionEl.textContent = "ソート完了！";
+                        nextActionEl.textContent = "完了しました。";
+                        log("ソート完了");
+                        return;
+                    }
+                    renderBars();
+                    j = n - 1; // 次のパスはまた右端から
+                    log(`--- パス ${i + 1} 開始 ---`);
+                }
+
+                phase = "compare";
+                const nextLeft = j - 1;
+                const nextRight = j;
+                nextActionEl.textContent = `次：棒 ${nextLeft} と ${nextRight} を比較します。`;
+                currentActionEl.textContent = "次のペアに進みました。";
+                return;
+            }
+        }
+
+        prepareBtn.addEventListener("click", prepare);
+        nextBtn.addEventListener("click", nextStep);
+        resetBtn.addEventListener("click", reset);
+    </script>
+
+</body>
+
+</html>
