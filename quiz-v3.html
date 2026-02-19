@@ -1199,6 +1199,523 @@
                 grid-template-columns: 1fr 1fr
             }
         }
+
+        /* ===== Disclaimer Banner ===== */
+        .disclaimer-banner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(251, 191, 36, .08);
+            border: 1px solid rgba(251, 191, 36, .3);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: all .3s ease;
+            text-align: left;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .disclaimer-banner:hover {
+            background: rgba(251, 191, 36, .14);
+            border-color: rgba(251, 191, 36, .5);
+            transform: translateY(-2px)
+        }
+
+        .disclaimer-banner-icon {
+            font-size: 28px;
+            flex-shrink: 0
+        }
+
+        .disclaimer-banner-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1
+        }
+
+        .disclaimer-banner-text strong {
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--accent-yellow)
+        }
+
+        .disclaimer-banner-text span {
+            font-size: .78rem;
+            color: var(--text-muted);
+            line-height: 1.5
+        }
+
+        .disclaimer-banner-arrow {
+            font-size: 1.2rem;
+            color: var(--accent-yellow);
+            flex-shrink: 0
+        }
+
+        /* ===== Disclaimer Screen ===== */
+        .disclaimer {
+            animation: fadeInUp .5s ease-out
+        }
+
+        .disclaimer-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            margin-top: 16px;
+            margin-bottom: 24px;
+            text-align: left
+        }
+
+        .disclaimer-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 16px
+        }
+
+        .disclaimer-lead {
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 24px
+        }
+
+        .disclaimer-lead strong {
+            color: var(--accent-yellow)
+        }
+
+        .disclaimer-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--surface-glass);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle)
+        }
+
+        .disclaimer-section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px
+        }
+
+        .disclaimer-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            font-weight: 800;
+            font-size: .85rem;
+            flex-shrink: 0
+        }
+
+        .disclaimer-section h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .disclaimer-section ul {
+            list-style: none;
+            padding: 0
+        }
+
+        .disclaimer-section li {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 8px;
+            padding-left: 16px;
+            position: relative
+        }
+
+        .disclaimer-section li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan)
+        }
+
+        .disclaimer-section li strong {
+            color: var(--accent-yellow)
+        }
+
+        .disclaimer-advice {
+            display: flex;
+            gap: 14px;
+            background: rgba(34, 211, 238, .06);
+            border: 1px solid rgba(34, 211, 238, .2);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 8px
+        }
+
+        .disclaimer-advice-icon {
+            font-size: 24px;
+            flex-shrink: 0
+        }
+
+        .disclaimer-advice h4 {
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 6px
+        }
+
+        .disclaimer-advice p {
+            font-size: .82rem;
+            color: var(--text-secondary);
+            line-height: 1.7
+        }
+
+        .disclaimer-advice p strong {
+            color: var(--accent-green)
+        }
+
+        /* ===== Mode Cards ===== */
+        .mode-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .mode-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: left;
+            transition: all .3s ease
+        }
+
+        .mode-card:hover {
+            border-color: rgba(34, 211, 238, .3);
+            transform: translateY(-2px)
+        }
+
+        .mode-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px
+        }
+
+        .mode-icon {
+            font-size: 28px
+        }
+
+        .mode-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .mode-desc {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 12px
+        }
+
+        .mode-meta {
+            display: flex;
+            gap: 16px;
+            font-size: .8rem;
+            color: var(--text-muted);
+            margin-bottom: 16px
+        }
+
+        .seq-start-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: .85rem;
+            color: var(--text-secondary)
+        }
+
+        .seq-start-picker select {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: .85rem;
+            cursor: pointer;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .start-btn.sequential {
+            background: linear-gradient(135deg, var(--accent-purple), #7c3aed)
+        }
+
+        /* ===== Blank Feedback (immediate explanation) ===== */
+        .blank-feedback {
+            margin-top: 12px;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            font-size: .85rem;
+            line-height: 1.7;
+            animation: fadeInUp .3s ease-out
+        }
+
+        .blank-feedback.correct {
+            background: rgba(52, 211, 153, .08);
+            border: 1px solid rgba(52, 211, 153, .3);
+            color: var(--text-secondary)
+        }
+
+        .blank-feedback.incorrect {
+            background: rgba(251, 113, 133, .08);
+            border: 1px solid rgba(251, 113, 133, .3);
+            color: var(--text-secondary)
+        }
+
+        .blank-feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 700
+        }
+
+        .blank-feedback.correct .blank-feedback-header {
+            color: var(--accent-green)
+        }
+
+        .blank-feedback.incorrect .blank-feedback-header {
+            color: var(--accent-red)
+        }
+
+        .blank-feedback .correct-answer-text {
+            color: var(--accent-green);
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        .overall-explanation {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(34, 211, 238, .06);
+            border: 1px solid rgba(34, 211, 238, .2);
+            border-radius: var(--radius-md);
+            font-size: .85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            animation: fadeInUp .3s ease-out
+        }
+
+        .overall-explanation h4 {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-bottom: 6px
+        }
+
+        /* ===== Score Ring ===== */
+        .score-ring-container {
+            display: flex;
+            justify-content: center;
+            margin: 24px 0
+        }
+
+        .score-ring {
+            position: relative;
+            width: 180px;
+            height: 180px
+        }
+
+        .score-ring svg {
+            transform: rotate(-90deg)
+        }
+
+        .ring-bg {
+            stroke: var(--border-subtle)
+        }
+
+        .ring-fill {
+            transition: stroke-dashoffset 1.5s ease-out
+        }
+
+        .ring-fill.excellent {
+            stroke: var(--accent-green)
+        }
+
+        .ring-fill.good {
+            stroke: var(--accent-cyan)
+        }
+
+        .ring-fill.ok {
+            stroke: var(--accent-yellow)
+        }
+
+        .score-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center
+        }
+
+        .score-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary)
+        }
+
+        .score-label {
+            font-size: .8rem;
+            color: var(--text-muted)
+        }
+
+        .encouragement {
+            text-align: center;
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            padding: 16px;
+            background: var(--surface-glass);
+            border-radius: var(--radius-md);
+            margin-top: 16px
+        }
+
+        /* ===== Review Section ===== */
+        .review-section {
+            margin-top: 24px
+        }
+
+        .review-block {
+            margin-bottom: 24px
+        }
+
+        .review-block-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px
+        }
+
+        .review-block-title.incorrect-title {
+            color: var(--accent-red)
+        }
+
+        .review-block-title.correct-title {
+            color: var(--accent-green)
+        }
+
+        .review-block-subtitle {
+            font-size: .8rem;
+            color: var(--text-muted);
+            margin-bottom: 16px
+        }
+
+        .review-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 12px
+        }
+
+        .review-item.incorrect {
+            border-left: 3px solid var(--accent-red)
+        }
+
+        .review-item.correct {
+            border-left: 3px solid var(--accent-green)
+        }
+
+        .review-item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px
+        }
+
+        .review-q-num {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: .9rem
+        }
+
+        .review-badge-wrong {
+            font-size: .7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(251, 113, 133, .15);
+            color: var(--accent-red);
+            font-weight: 600
+        }
+
+        .review-badge-ok {
+            font-size: .7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(52, 211, 153, .15);
+            color: var(--accent-green);
+            font-weight: 600
+        }
+
+        .review-q-text {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            line-height: 1.6
+        }
+
+        .review-answer-row {
+            margin-bottom: 6px
+        }
+
+        .review-your-answer.wrong {
+            font-size: .82rem;
+            color: var(--accent-red)
+        }
+
+        .review-correct-answer {
+            font-size: .82rem;
+            color: var(--accent-green);
+            font-weight: 600
+        }
+
+        .review-explanation {
+            font-size: .82rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-subtle)
+        }
+
+        .score-badge {
+            background: rgba(52, 211, 153, .12);
+            border: 1px solid rgba(52, 211, 153, .3);
+            border-radius: var(--radius-md);
+            padding: 6px 14px;
+            font-size: .85rem;
+            color: var(--accent-green);
+            font-weight: 600
+        }
+
+        .score-badge .score-val {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800
+        }
     </style>
 </head>
 
@@ -1232,9 +1749,118 @@
                         <div class="card-value">Python</div>
                     </div>
                 </div>
-                <div class="problem-list" id="problemList"></div>
-                <button class="start-btn" onclick="startQuiz()">順番に解く ⚡</button>
-                <button class="start-btn answers" onclick="showAnswers()">模範解答・解説を見る 📖</button>
+
+
+                <!-- Disclaimer Banner -->
+                <div class="disclaimer-banner" onclick="showScreen('disclaimer')">
+                    <div class="disclaimer-banner-icon">⚠️</div>
+                    <div class="disclaimer-banner-text">
+                        <strong>はじめに必ずお読みください</strong>
+                        <span>利用上の注意事項と学習アドバイス</span>
+                    </div>
+                    <div class="disclaimer-banner-arrow">→</div>
+                </div>
+
+                <!-- Mode Cards -->
+                <div class="mode-cards">
+                    <div class="mode-card">
+                        <div class="mode-card-header">
+                            <span class="mode-icon">🎲</span>
+                            <h3>ランダム5問</h3>
+                        </div>
+                        <p class="mode-desc">15問の中からランダムで5問を出題。サクッと復習したい時に！</p>
+                        <div class="mode-meta">
+                            <span>⏱ 約5分</span>
+                            <span>📝 5問</span>
+                        </div>
+                        <button class="start-btn" onclick="startQuizRandom()">ランダム5問スタート ⚡</button>
+                    </div>
+                    <div class="mode-card">
+                        <div class="mode-card-header">
+                            <span class="mode-icon">📖</span>
+                            <h3>全問チャレンジ</h3>
+                        </div>
+                        <p class="mode-desc">全15問を順番に解く。しっかり復習したい時に！</p>
+                        <div class="seq-start-picker">
+                            <label>開始問題：</label>
+                            <select id="seqStartSelect"></select>
+                        </div>
+                        <div class="mode-meta">
+                            <span>⏱ 約15分</span>
+                            <span>📝 15問</span>
+                        </div>
+                        <button class="start-btn sequential" onclick="startQuizSequential()">全問スタート 🚀</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Screen: Disclaimer -->
+        <div id="screen-disclaimer" class="screen">
+            <div class="disclaimer">
+                <div class="disclaimer-card">
+                    <h2 class="disclaimer-title">⚠️ ご利用にあたっての注意事項</h2>
+                    <p class="disclaimer-lead">このクイズアプリは、<strong>理数情報の期末テスト対策</strong>として作成された学習支援ツールです。以下の点にご注意ください。
+                    </p>
+
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header">
+                            <span class="disclaimer-num">1</span>
+                            <h3>出題範囲について</h3>
+                        </div>
+                        <ul>
+                            <li>このアプリの問題は、<strong>授業で扱った内容</strong>をもとに作成しています</li>
+                            <li>実際のテストとは出題形式や難易度が異なる場合があります</li>
+                            <li>テスト範囲の全てを網羅しているわけではありません</li>
+                        </ul>
+                    </div>
+
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header">
+                            <span class="disclaimer-num">2</span>
+                            <h3>学習方法について</h3>
+                        </div>
+                        <ul>
+                            <li>このアプリだけでなく、<strong>教科書やノート</strong>も併用して学習してください</li>
+                            <li>分からない問題は、解説をよく読んで理解するようにしましょう</li>
+                            <li>繰り返し解くことで、知識の定着が期待できます</li>
+                        </ul>
+                    </div>
+
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header">
+                            <span class="disclaimer-num">3</span>
+                            <h3>コードの表記について</h3>
+                        </div>
+                        <ul>
+                            <li>問題中のPythonコードは、<strong>Google Colaboratory</strong>で動作する形式で記述しています</li>
+                            <li>インデント（字下げ）はスペース4つで統一しています</li>
+                            <li>コードの色分けは見やすさのためのもので、実際の実行環境とは異なります</li>
+                        </ul>
+                    </div>
+
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header">
+                            <span class="disclaimer-num">4</span>
+                            <h3>免責事項</h3>
+                        </div>
+                        <ul>
+                            <li>内容の正確性には十分注意していますが、<strong>誤りがある可能性</strong>もあります</li>
+                            <li>疑問点がある場合は、先生に質問してください</li>
+                        </ul>
+                    </div>
+
+                    <div class="disclaimer-advice">
+                        <div class="disclaimer-advice-icon">💡</div>
+                        <div>
+                            <h4>学習アドバイス</h4>
+                            <p>まずは<strong>全問チャレンジ</strong>で一通り解いてみましょう。間違えた問題は解説を読んでから、もう一度<strong>ランダム5問</strong>で復習すると効果的です。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <button class="start-btn" onclick="showScreen('intro')">← トップに戻る</button>
             </div>
         </div>
 
@@ -1446,9 +2072,10 @@
            INTRO
            ============================================================ */
         function buildIntro() {
-            const list = document.getElementById('problemList');
-            list.innerHTML = '<h3>📋 出題内容</h3>' + questions.map(q =>
-                `<div class="problem-list-item"><span class="pl-num">${q.id}</span><span class="pl-title">${q.title}</span></div>`
+            // Populate sequential start-from select
+            const sel = document.getElementById('seqStartSelect');
+            sel.innerHTML = questions.map((q, i) =>
+                `<option value="${i}">第${q.id}問</option>`
             ).join('');
         }
         buildIntro();
@@ -1461,12 +2088,38 @@
         let totalCorrect = 0;
         let totalBlanks = 0;
         let answersLog = [];
+        let quizMode = 'sequential'; // 'random' or 'sequential'
+        let quizQuestions = []; // the subset of questions being used
 
-        function startQuiz() {
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function startQuizRandom() {
+            quizMode = 'random';
+            quizQuestions = shuffleArray(questions).slice(0, 5);
             currentQIdx = 0;
             blankAnswers = {};
             totalCorrect = 0;
-            totalBlanks = questions.reduce((s, q) => s + q.blanks.length, 0);
+            totalBlanks = quizQuestions.reduce((s, q) => s + q.blanks.length, 0);
+            answersLog = [];
+            renderQuestion();
+            showScreen('quiz');
+        }
+
+        function startQuizSequential() {
+            quizMode = 'sequential';
+            const startFrom = parseInt(document.getElementById('seqStartSelect').value) || 0;
+            quizQuestions = questions.slice(startFrom);
+            currentQIdx = 0;
+            blankAnswers = {};
+            totalCorrect = 0;
+            totalBlanks = quizQuestions.reduce((s, q) => s + q.blanks.length, 0);
             answersLog = [];
             renderQuestion();
             showScreen('quiz');
@@ -1479,8 +2132,8 @@
         }
 
         function renderQuestion() {
-            const q = questions[currentQIdx];
-            const total = questions.length;
+            const q = quizQuestions[currentQIdx];
+            const total = quizQuestions.length;
             const progressPct = (currentQIdx / total) * 100;
             const hasAnswerData = q.blanks.every(b => b.answer !== null);
 
@@ -1507,6 +2160,7 @@
                     </button>`;
                 }).join('')}
             </div>
+            <div id="feedback-${key}"></div>
         </div>`;
             });
 
@@ -1519,7 +2173,7 @@
             const area = document.getElementById('quizArea');
             area.innerHTML = `
     <div class="quiz-header">
-        <div class="question-counter">大問 <span>${currentQIdx + 1}</span> / ${total}</div>
+        <div class="question-counter">大問 <span>${currentQIdx + 1}</span> / ${total}${quizMode === 'random' ? ' (ランダム)' : ''}</div>
         <button class="back-btn" onclick="goHome()">← トップへ</button>
     </div>
     <div class="progress-bar-wrapper"><div class="progress-bar-fill" style="width:${progressPct}%"></div></div>
@@ -1534,6 +2188,7 @@
         </div>
         <div class="quiz-split-right">
             ${blanksHtml}
+            <div id="overallFeedback"></div>
             <div id="feedbackArea"></div>
             ${allBlanksDone ? `<button class="next-btn" onclick="handleNextQuestion()">${currentQIdx + 1 >= total ? '結果を見る 🏆' : '次の大問へ →'}</button>` : ''}
         </div>
@@ -1547,7 +2202,7 @@
             if (blankAnswers[key] !== undefined) return;
             blankAnswers[key] = choiceIdx;
 
-            const q = questions[currentQIdx];
+            const q = quizQuestions[currentQIdx];
             const blank = q.blanks[blankIdx];
             const hasAnswerData = blank.answer !== null;
 
@@ -1566,6 +2221,28 @@
                     if (idx === blank.answer) btn.classList.add('correct');
                     else if (idx === choiceIdx) btn.classList.add('incorrect');
                 });
+
+                // Show immediate explanation (Feature #3)
+                const fbArea = document.getElementById('feedback-' + key);
+                if (fbArea) {
+                    const correctText = `${CHOICE_NUMS[blank.answer - 1]} ${escapeHtml(blank.choices[blank.answer - 1])}`;
+                    if (correct) {
+                        fbArea.innerHTML = `
+                            <div class="blank-feedback correct">
+                                <div class="blank-feedback-header">🎉 正解！</div>
+                                ${blank.explanation ? `<div>${escapeHtml(blank.explanation)}</div>` : ''}
+                            </div>`;
+                    } else {
+                        fbArea.innerHTML = `
+                            <div class="blank-feedback incorrect">
+                                <div class="blank-feedback-header">💡 不正解</div>
+                                <div class="correct-answer-text">正解: ${correctText}</div>
+                                ${blank.explanation ? `<div>${escapeHtml(blank.explanation)}</div>` : ''}
+                            </div>`;
+                    }
+                    // Auto-scroll to feedback
+                    setTimeout(() => fbArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+                }
             } else {
                 // No answer data - just mark as selected
                 document.querySelectorAll(`.blank-choice-btn[data-key="${key}"]`).forEach(btn => {
@@ -1577,20 +2254,37 @@
             // Check if all blanks for this question are answered
             const allDone = q.blanks.every((_, bi) => blankAnswers[q.id + '-' + bi] !== undefined);
             if (allDone) {
-                const total = questions.length;
+                const total = quizQuestions.length;
                 const pct = ((currentQIdx + 1) / total) * 100;
                 const fill = document.querySelector('.progress-bar-fill');
                 if (fill) fill.style.width = pct + '%';
 
+                // Show overall explanation
+                if (q.overallExplanation) {
+                    const overallArea = document.getElementById('overallFeedback');
+                    if (overallArea) {
+                        overallArea.innerHTML = `
+                            <div class="overall-explanation">
+                                <h4>💡 この問題の解説</h4>
+                                <div>${escapeHtml(q.overallExplanation)}</div>
+                            </div>`;
+                    }
+                }
+
                 const nextArea = document.getElementById('feedbackArea');
                 if (nextArea) {
-                    nextArea.innerHTML = `<button class="next-btn" onclick="handleNextQuestion()">${currentQIdx + 1 >= total ? '結果を見る 🏆' : '次の大問へ →'}</button>`;
+                    nextArea.innerHTML = `<button class="next-btn" id="nextBtn" onclick="handleNextQuestion()">${currentQIdx + 1 >= total ? '結果を見る 🏆' : '次の大問へ →'}</button>`;
+                    // Auto-scroll to Next button (Feature #6)
+                    setTimeout(() => {
+                        const btn = document.getElementById('nextBtn');
+                        if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }, 200);
                 }
             }
         }
 
         function handleNextQuestion() {
-            if (currentQIdx + 1 >= questions.length) {
+            if (currentQIdx + 1 >= quizQuestions.length) {
                 showResult();
             } else {
                 currentQIdx++;
@@ -1599,30 +2293,127 @@
         }
 
         /* ============================================================
-           RESULT
+           RESULT (Enhanced — Feature #4)
            ============================================================ */
         function showResult() {
             document.querySelector('.app-container').classList.remove('wide-mode');
             const total = totalBlanks;
             const pct = total > 0 ? Math.round((totalCorrect / total) * 100) : 0;
-            const hasData = questions.some(q => q.blanks.some(b => b.answer !== null));
+            const hasData = quizQuestions.some(q => q.blanks.some(b => b.answer !== null));
+
+            // Score ring SVG
+            const radius = 72;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (pct / 100) * circumference;
+            const ringClass = pct >= 80 ? 'excellent' : pct >= 50 ? 'good' : 'ok';
+
+            // Title based on percentage
+            let titleEmoji, titleText, encourageMsg;
+            if (pct === 100) {
+                titleEmoji = '👑'; titleText = '情報マスター！';
+                encourageMsg = 'パーフェクト！全問正解です！素晴らしい！';
+            } else if (pct >= 80) {
+                titleEmoji = '🌟'; titleText = 'エキスパート！';
+                encourageMsg = '素晴らしい成績です！間違えた問題を復習して、パーフェクトを目指しましょう！';
+            } else if (pct >= 60) {
+                titleEmoji = '💪'; titleText = 'チャレンジャー！';
+                encourageMsg = 'よく頑張りました！間違えた問題の解説を読んで、もう一度挑戦してみましょう！';
+            } else if (pct >= 40) {
+                titleEmoji = '🔥'; titleText = 'ルーキー！';
+                encourageMsg = 'まだまだこれから！解説をしっかり読んで、教科書やノートも見直してみましょう！';
+            } else {
+                titleEmoji = '🚀'; titleText = 'スタート地点！';
+                encourageMsg = 'ここからがスタートです！解説を読んでから、もう一度挑戦してみましょう！';
+            }
+
+            // Build review list
+            let reviewHtml = '';
+            if (hasData && answersLog.length > 0) {
+                const incorrect = [];
+                const correctList = [];
+                quizQuestions.forEach(q => {
+                    q.blanks.forEach((blank, bi) => {
+                        const log = answersLog.find(l => l.questionId === q.id && l.blankLabel === blank.label);
+                        if (!log) return;
+                        const item = { q, blank, log };
+                        if (log.correct) correctList.push(item);
+                        else incorrect.push(item);
+                    });
+                });
+
+                if (incorrect.length > 0) {
+                    reviewHtml += `<div class="review-block">
+                        <div class="review-block-title incorrect-title">❌ 間違えた問題 (${incorrect.length}問)</div>
+                        <div class="review-block-subtitle">復習して理解を深めましょう</div>`;
+                    incorrect.forEach(({ q, blank, log }) => {
+                        const yourAnswer = `${CHOICE_NUMS[log.selected - 1]} ${escapeHtml(blank.choices[log.selected - 1])}`;
+                        const correctAnswer = `${CHOICE_NUMS[blank.answer - 1]} ${escapeHtml(blank.choices[blank.answer - 1])}`;
+                        reviewHtml += `
+                        <div class="review-item incorrect">
+                            <div class="review-item-header">
+                                <span class="review-q-num">問題${q.id}【${blank.label}】</span>
+                                <span class="review-badge-wrong">不正解</span>
+                            </div>
+                            <div class="review-q-text">${escapeHtml(q.title)}</div>
+                            <div class="review-answer-row"><span class="review-your-answer wrong">あなたの回答: ${yourAnswer}</span></div>
+                            <div class="review-answer-row"><span class="review-correct-answer">正解: ${correctAnswer}</span></div>
+                            ${blank.explanation ? `<div class="review-explanation">💡 ${escapeHtml(blank.explanation)}</div>` : ''}
+                        </div>`;
+                    });
+                    reviewHtml += `</div>`;
+                }
+
+                if (correctList.length > 0) {
+                    reviewHtml += `<div class="review-block">
+                        <div class="review-block-title correct-title">✅ 正解した問題 (${correctList.length}問)</div>`;
+                    correctList.forEach(({ q, blank, log }) => {
+                        const correctAnswer = `${CHOICE_NUMS[blank.answer - 1]} ${escapeHtml(blank.choices[blank.answer - 1])}`;
+                        reviewHtml += `
+                        <div class="review-item correct">
+                            <div class="review-item-header">
+                                <span class="review-q-num">問題${q.id}【${blank.label}】</span>
+                                <span class="review-badge-ok">正解</span>
+                            </div>
+                            <div class="review-q-text">${escapeHtml(q.title)}</div>
+                            <div class="review-answer-row"><span class="review-correct-answer">正解: ${correctAnswer}</span></div>
+                        </div>`;
+                    });
+                    reviewHtml += `</div>`;
+                }
+            }
 
             const area = document.getElementById('resultArea');
             area.innerHTML = `
     <div class="result-card">
-        <div class="result-icon">🏁</div>
-        <h2 class="result-title good">お疲れさまでした！</h2>
-        <p class="result-subtitle">全${questions.length}問の回答が完了しました</p>
+        <div class="result-icon">${titleEmoji}</div>
+        <h2 class="result-title good">${titleText}</h2>
+        <p class="result-subtitle">${quizMode === 'random' ? 'ランダム5問' : `全${quizQuestions.length}問`}の回答が完了しました</p>
         ${hasData ? `
+        <div class="score-ring-container">
+            <div class="score-ring">
+                <svg width="180" height="180">
+                    <circle class="ring-bg" cx="90" cy="90" r="${radius}" fill="none" stroke-width="10" />
+                    <circle class="ring-fill ${ringClass}" cx="90" cy="90" r="${radius}" fill="none" stroke-width="10" stroke-linecap="round"
+                        stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" />
+                </svg>
+                <div class="score-center">
+                    <div class="score-number">${pct}%</div>
+                    <div class="score-label">${totalCorrect} / ${total}</div>
+                </div>
+            </div>
+        </div>
         <div class="stats-grid">
             <div class="stat-item correct-stat"><div class="stat-icon">✅</div><div class="stat-value">${totalCorrect}</div><div class="stat-label">正解</div></div>
             <div class="stat-item incorrect-stat"><div class="stat-icon">❌</div><div class="stat-value">${total - totalCorrect}</div><div class="stat-label">不正解</div></div>
-            <div class="stat-item rate-stat"><div class="stat-icon">📊</div><div class="stat-value">${totalCorrect}/${total}</div><div class="stat-label">スコア</div></div>
-        </div>` : `
-        <div class="disabled-notice" style="text-align:left">⚠️ 模範解答データが未設定のため、正誤判定は行われませんでした。解答データが追加され次第、自動採点が有効になります。</div>`}
+        </div>
+        <div class="encouragement">${encourageMsg}</div>
+        ` : `
+        <div class="disabled-notice" style="text-align:left">⚠️ 模範解答データが未設定のため、正誤判定は行われませんでした。</div>`}
     </div>
+    <div class="review-section">${reviewHtml}</div>
     <div class="result-actions">
-        <button class="retry-btn" onclick="startQuiz()">🔄 もう一度チャレンジ</button>
+        <button class="retry-btn" onclick="startQuizRandom()">🎲 ランダム5問</button>
+        <button class="retry-btn" onclick="startQuizSequential()">📖 全問チャレンジ</button>
         <button class="start-btn answers" onclick="showAnswers()" style="max-width:300px">📖 模範解答・解説を見る</button>
         <button class="home-btn" onclick="goHome()">🏠 トップに戻る</button>
     </div>`;
