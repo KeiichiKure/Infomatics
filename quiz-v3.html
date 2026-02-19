@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理数情報 プログラミング問題演習</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2035;
+            --bg-card-hover: #212b45;
+            --bg-code: #0d1117;
+            --surface-glass: rgba(255, 255, 255, .04);
+            --accent-cyan: #22d3ee;
+            --accent-cyan-glow: rgba(34, 211, 238, .3);
+            --accent-pink: #f472b6;
+            --accent-pink-glow: rgba(244, 114, 182, .3);
+            --accent-purple: #a78bfa;
+            --accent-purple-glow: rgba(167, 139, 250, .3);
+            --accent-green: #34d399;
+            --accent-green-glow: rgba(52, 211, 153, .4);
+            --accent-red: #fb7185;
+            --accent-red-glow: rgba(251, 113, 133, .4);
+            --accent-yellow: #fbbf24;
+            --accent-orange: #fb923c;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255, 255, 255, .06);
+            --border-glow: rgba(34, 211, 238, .2);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, .3);
+            --shadow-glow-cyan: 0 0 30px rgba(34, 211, 238, .15);
+            --shadow-glow-green: 0 0 30px rgba(52, 211, 153, .2);
+            --shadow-glow-red: 0 0 30px rgba(251, 113, 133, .2)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden
+        }
+
+        .bg-orbs .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .3;
+            animation: float 20s ease-in-out infinite
+        }
+
+        .bg-orbs .orb:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-cyan);
+            top: -10%;
+            left: -5%;
+            animation-delay: 0s
+        }
+
+        .bg-orbs .orb:nth-child(2) {
+            width: 350px;
+            height: 350px;
+            background: var(--accent-pink);
+            top: 50%;
+            right: -10%;
+            animation-delay: -7s
+        }
+
+        .bg-orbs .orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-purple);
+            bottom: -5%;
+            left: 30%;
+            animation-delay: -14s
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            25% {
+                transform: translate(30px, -40px) scale(1.05)
+            }
+
+            50% {
+                transform: translate(-20px, 20px) scale(.95)
+            }
+
+            75% {
+                transform: translate(40px, 30px) scale(1.02)
+            }
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 780px;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            transition: max-width .3s ease
+        }
+
+        .app-container.wide-mode {
+            max-width: 1280px
+        }
+
+        .screen {
+            display: none;
+            width: 100%
+        }
+
+        .screen.active {
+            display: block
+        }
+
+        /* Intro */
+        .intro {
+            text-align: center;
+            animation: fadeInUp .6s ease-out
+        }
+
+        .intro .logo-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: pulse-glow 2s ease-in-out infinite
+        }
+
+        .intro h1 {
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            line-height: 1.3
+        }
+
+        .intro .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px
+        }
+
+        .intro .info-cards {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap
+        }
+
+        .intro .info-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px
+        }
+
+        .intro .info-card .card-icon {
+            font-size: 28px
+        }
+
+        .intro .info-card .card-label {
+            font-size: .75rem;
+            color: var(--text-muted)
+        }
+
+        .intro .info-card .card-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-cyan)
+        }
+
+        /* Problem list on intro */
+        .problem-list {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto 24px;
+            text-align: left
+        }
+
+        .problem-list h3 {
+            font-size: .95rem;
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+            text-align: center
+        }
+
+        .problem-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+            transition: all .25s ease;
+            cursor: default
+        }
+
+        .problem-list-item .pl-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-cyan-glow), var(--accent-purple-glow));
+            border: 1px solid var(--border-glow);
+            border-radius: 50%;
+            font-size: .75rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            flex-shrink: 0
+        }
+
+        .problem-list-item .pl-title {
+            font-size: .88rem;
+            color: var(--text-secondary)
+        }
+
+        /* Buttons */
+        .start-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 420px;
+            padding: 14px 48px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease;
+            box-shadow: 0 4px 20px var(--accent-cyan-glow);
+            overflow: hidden;
+            margin-bottom: 12px
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, .2) 50%, transparent 60%);
+            transition: transform .5s ease;
+            transform: translateX(-100%)
+        }
+
+        .start-btn:hover::before {
+            transform: translateX(100%)
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--accent-cyan-glow)
+        }
+
+        .start-btn.answers {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            box-shadow: 0 4px 20px var(--accent-purple-glow)
+        }
+
+        .start-btn.answers:hover {
+            box-shadow: 0 8px 32px var(--accent-purple-glow)
+        }
+
+        /* Quiz */
+        .quiz {
+            width: 100%;
+            animation: fadeInUp .4s ease-out
+        }
+
+        /* Split Panel Layout */
+        .quiz-split {
+            display: flex;
+            gap: 24px;
+            width: 100%;
+            height: calc(100vh - 120px);
+            min-height: 400px
+        }
+
+        .quiz-split-left {
+            flex: 1 1 55%;
+            min-width: 0;
+            overflow-y: auto;
+            padding-right: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(34, 211, 238, .3) transparent
+        }
+
+        .quiz-split-left::-webkit-scrollbar {
+            width: 6px
+        }
+
+        .quiz-split-left::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        .quiz-split-left::-webkit-scrollbar-thumb {
+            background: rgba(34, 211, 238, .3);
+            border-radius: 3px
+        }
+
+        .quiz-split-right {
+            flex: 1 1 45%;
+            min-width: 0;
+            overflow-y: auto;
+            padding-right: 4px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(167, 139, 250, .3) transparent
+        }
+
+        .quiz-split-right::-webkit-scrollbar {
+            width: 6px
+        }
+
+        .quiz-split-right::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        .quiz-split-right::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, .3);
+            border-radius: 3px
+        }
+
+        .quiz-split-left .question-card {
+            margin-bottom: 0
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px
+        }
+
+        .quiz-header .question-counter {
+            font-size: .85rem;
+            color: var(--text-muted)
+        }
+
+        .quiz-header .question-counter span {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--accent-cyan)
+        }
+
+        .progress-bar-wrapper {
+            width: 100%;
+            height: 6px;
+            background: var(--surface-glass);
+            border-radius: 10px;
+            margin-bottom: 28px;
+            overflow: hidden
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            transition: width .5s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card)
+        }
+
+        .question-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--accent-cyan-glow), var(--accent-purple-glow));
+            border: 1px solid var(--border-glow);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 14px
+        }
+
+        .question-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 14px
+        }
+
+        .question-desc {
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 18px
+        }
+
+        .question-desc strong {
+            color: var(--accent-cyan);
+            font-weight: 600
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-code);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            position: relative
+        }
+
+        .code-block::before {
+            content: 'Python';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: .65rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .code-block pre {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: .88rem;
+            line-height: 1.9;
+            color: #c9d1d9;
+            white-space: pre-wrap;
+            word-break: break-all
+        }
+
+        .code-block .blank {
+            background: rgba(34, 211, 238, .15);
+            border: 1px solid rgba(34, 211, 238, .4);
+            border-radius: 4px;
+            padding: 1px 8px;
+            color: var(--accent-cyan);
+            font-weight: 600
+        }
+
+        .code-block .code-keyword {
+            color: #ff7b72
+        }
+
+        .code-block .code-func {
+            color: #d2a8ff
+        }
+
+        .code-block .code-string {
+            color: #a5d6ff
+        }
+
+        .code-block .code-number {
+            color: #79c0ff
+        }
+
+        .code-block .code-comment {
+            color: #8b949e;
+            font-style: italic
+        }
+
+        .code-block .code-op {
+            color: #ff7b72
+        }
+
+        /* Blank Group */
+        .blank-group {
+            margin-bottom: 20px;
+            padding: 18px 20px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md)
+        }
+
+        .blank-group-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: .92rem;
+            font-weight: 700;
+            color: var(--accent-cyan)
+        }
+
+        .blank-group-label .blank-tag {
+            background: rgba(34, 211, 238, .15);
+            border: 1px solid rgba(34, 211, 238, .3);
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: .82rem
+        }
+
+        .blank-group-sublabel {
+            font-size: .8rem;
+            color: var(--text-muted);
+            margin-bottom: 10px
+        }
+
+        .blank-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .blank-choice-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            font-size: .9rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all .25s ease;
+            text-align: left;
+            line-height: 1.5
+        }
+
+        .blank-choice-btn .choice-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            font-weight: 700;
+            font-size: .8rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            transition: all .25s ease
+        }
+
+        .blank-choice-btn:hover:not(:disabled) {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-glow-cyan)
+        }
+
+        .blank-choice-btn:hover:not(:disabled) .choice-num {
+            background: var(--accent-cyan-glow);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan)
+        }
+
+        .blank-choice-btn.correct {
+            background: rgba(52, 211, 153, .1);
+            border-color: var(--accent-green);
+            box-shadow: var(--shadow-glow-green)
+        }
+
+        .blank-choice-btn.correct .choice-num {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green)
+        }
+
+        .blank-choice-btn.incorrect {
+            background: rgba(251, 113, 133, .1);
+            border-color: var(--accent-red);
+            box-shadow: var(--shadow-glow-red);
+            animation: shake .5s ease-in-out
+        }
+
+        .blank-choice-btn.incorrect .choice-num {
+            background: var(--accent-red);
+            color: var(--bg-primary);
+            border-color: var(--accent-red)
+        }
+
+        .blank-choice-btn:disabled {
+            cursor: default;
+            opacity: .6
+        }
+
+        .blank-choice-btn.correct:disabled,
+        .blank-choice-btn.incorrect:disabled {
+            opacity: 1
+        }
+
+        /* Feedback */
+        .feedback {
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            animation: fadeInUp .4s ease-out
+        }
+
+        .feedback.correct {
+            background: rgba(52, 211, 153, .08);
+            border: 1px solid rgba(52, 211, 153, .3)
+        }
+
+        .feedback.incorrect {
+            background: rgba(251, 113, 133, .08);
+            border: 1px solid rgba(251, 113, 133, .3)
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px
+        }
+
+        .feedback-icon {
+            font-size: 32px;
+            animation: pop-in .4s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        .feedback-title {
+            font-size: 1.2rem;
+            font-weight: 700
+        }
+
+        .feedback.correct .feedback-title {
+            color: var(--accent-green)
+        }
+
+        .feedback.incorrect .feedback-title {
+            color: var(--accent-red)
+        }
+
+        .feedback-explanation {
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 10px
+        }
+
+        /* Next Button */
+        .next-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all .3s ease;
+            box-shadow: 0 4px 16px var(--accent-cyan-glow)
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px var(--accent-cyan-glow)
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 20px;
+            font-size: .85rem;
+            font-weight: 600;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-secondary);
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease;
+            margin-bottom: 20px
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover)
+        }
+
+        /* Answer/Explanation Screen */
+        .answers-screen {
+            width: 100%;
+            animation: fadeInUp .6s ease-out
+        }
+
+        .answers-header {
+            text-align: center;
+            margin-bottom: 28px
+        }
+
+        .answers-header h2 {
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px
+        }
+
+        .answers-header p {
+            color: var(--text-secondary);
+            font-size: .9rem
+        }
+
+        .answer-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-card)
+        }
+
+        .answer-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle)
+        }
+
+        .answer-card-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            font-size: .9rem;
+            font-weight: 800;
+            color: var(--bg-primary);
+            flex-shrink: 0
+        }
+
+        .answer-card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .answer-blank-item {
+            margin-bottom: 16px;
+            padding: 16px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md)
+        }
+
+        .answer-blank-label {
+            font-size: .88rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .answer-blank-label .abl-tag {
+            background: rgba(34, 211, 238, .15);
+            border: 1px solid rgba(34, 211, 238, .3);
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: .78rem
+        }
+
+        .answer-correct-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: .9rem
+        }
+
+        .answer-correct-badge {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 700;
+            flex-shrink: 0
+        }
+
+        .answer-correct-text {
+            color: var(--accent-green);
+            font-weight: 600
+        }
+
+        .answer-explanation-text {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            line-height: 1.7
+        }
+
+        .answer-overall {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(167, 139, 250, .06);
+            border: 1px solid rgba(167, 139, 250, .2);
+            border-radius: var(--radius-md)
+        }
+
+        .answer-overall h4 {
+            font-size: .88rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .answer-overall p {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            line-height: 1.7
+        }
+
+        .placeholder-msg {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(251, 191, 36, .08);
+            border: 1px solid rgba(251, 191, 36, .2);
+            border-radius: var(--radius-sm);
+            font-size: .82rem;
+            color: var(--accent-yellow);
+            margin-top: 8px
+        }
+
+        /* Result Screen */
+        .result {
+            text-align: center;
+            width: 100%;
+            animation: fadeInUp .6s ease-out
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 40px 28px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 24px
+        }
+
+        .result-icon {
+            font-size: 72px;
+            margin-bottom: 12px;
+            animation: pop-in .6s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 6px
+        }
+
+        .result-title.excellent {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .result-title.good {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .result-title.ok {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .result-subtitle {
+            color: var(--text-secondary);
+            font-size: .9rem;
+            margin-bottom: 24px
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 28px
+        }
+
+        .stat-item {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 12px
+        }
+
+        .stat-icon {
+            font-size: 22px;
+            margin-bottom: 4px
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700
+        }
+
+        .stat-label {
+            font-size: .7rem;
+            color: var(--text-muted)
+        }
+
+        .stat-item.correct-stat .stat-value {
+            color: var(--accent-green)
+        }
+
+        .stat-item.incorrect-stat .stat-value {
+            color: var(--accent-red)
+        }
+
+        .stat-item.rate-stat .stat-value {
+            color: var(--accent-cyan)
+        }
+
+        .encouragement {
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--surface-glass);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle)
+        }
+
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 24px
+        }
+
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease;
+            box-shadow: 0 4px 20px var(--accent-pink-glow)
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--accent-pink-glow)
+        }
+
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 32px;
+            font-size: .95rem;
+            font-weight: 600;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-secondary);
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease
+        }
+
+        .home-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            transform: translateY(-2px)
+        }
+
+        /* Disabled state notice */
+        .disabled-notice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 18px;
+            background: rgba(251, 191, 36, .08);
+            border: 1px solid rgba(251, 191, 36, .25);
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: .85rem;
+            color: var(--accent-yellow)
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes pop-in {
+            from {
+                transform: scale(0)
+            }
+
+            to {
+                transform: scale(1)
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 8px rgba(34, 211, 238, .3))
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px rgba(34, 211, 238, .6))
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            20% {
+                transform: translateX(-8px)
+            }
+
+            40% {
+                transform: translateX(8px)
+            }
+
+            60% {
+                transform: translateX(-4px)
+            }
+
+            80% {
+                transform: translateX(4px)
+            }
+        }
+
+        @keyframes slide-in-choice {
+            from {
+                opacity: 0;
+                transform: translateX(-12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        /* Responsive */
+        @media(max-width:900px) {
+            .quiz-split {
+                flex-direction: column;
+                height: auto;
+                min-height: unset
+            }
+
+            .quiz-split-left,
+            .quiz-split-right {
+                flex: none;
+                overflow-y: visible;
+                padding-right: 0
+            }
+
+            .quiz-split-left .question-card {
+                margin-bottom: 20px
+            }
+
+            .app-container.wide-mode {
+                max-width: 780px
+            }
+        }
+
+        @media(max-width:600px) {
+            .intro h1 {
+                font-size: 1.6rem
+            }
+
+            .answers-header h2 {
+                font-size: 1.4rem
+            }
+
+            .question-card,
+            .answer-card {
+                padding: 20px 16px
+            }
+
+            .code-block {
+                padding: 14px 16px
+            }
+
+            .code-block pre {
+                font-size: .78rem
+            }
+
+            .blank-group {
+                padding: 14px 16px
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+    <div class="app-container">
+        <!-- Screen: Intro -->
+        <div id="screen-intro" class="screen active">
+            <div class="intro">
+                <div class="logo-icon">💻</div>
+                <h1>プログラミング問題演習</h1>
+                <p class="subtitle">理数情報 ３学期期末テスト対策</p>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="card-icon">📝</div>
+                        <div class="card-label">大問数</div>
+                        <div class="card-value">15問</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🔤</div>
+                        <div class="card-label">小問数</div>
+                        <div class="card-value">30問</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🐍</div>
+                        <div class="card-label">言語</div>
+                        <div class="card-value">Python</div>
+                    </div>
+                </div>
+                <div class="problem-list" id="problemList"></div>
+                <button class="start-btn" onclick="startQuiz()">順番に解く ⚡</button>
+                <button class="start-btn answers" onclick="showAnswers()">模範解答・解説を見る 📖</button>
+            </div>
+        </div>
+
+        <!-- Screen: Quiz -->
+        <div id="screen-quiz" class="screen">
+            <div class="quiz" id="quizArea"></div>
+        </div>
+
+        <!-- Screen: Result -->
+        <div id="screen-result" class="screen">
+            <div class="result" id="resultArea"></div>
+        </div>
+
+        <!-- Screen: Answers -->
+        <div id="screen-answers" class="screen">
+            <div class="answers-screen" id="answersArea"></div>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           DATA — 5 Problems with blanks
+           ============================================================ */
+        const questions = [
+            {
+                id: 1,
+                title: "配列と反復処理（合計と平均）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：テストの点数の合計と平均を求めるプログラムを作りたいです。\nT：配列（リスト）に点数を入れて、for文で順番にデータを取り出して足していきましょう。配列の要素数を取得する関数を使うと便利です。",
+                code: 'tensu = [<span class="code-number">78</span>, <span class="code-number">85</span>, <span class="code-number">62</span>, <span class="code-number">91</span>, <span class="code-number">70</span>]\ngoukei = <span class="code-number">0</span>\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>( <span class="blank">【 ア 】</span> ):\n    goukei = goukei + <span class="blank">【 イ 】</span>\nheikin = goukei / <span class="blank">【 ア 】</span>\n<span class="code-func">print</span>(<span class="code-string">"平均は"</span>, heikin)',
+                blanks: [
+                    { label: "ア", choices: ["len(tensu)", "sum(tensu)", "tensu.append()", "tensu[i]"], answer: 1, explanation: "配列の要素数（データの個数）を取得するには、組み込み関数である len() を使います。range(len(tensu)) と記述することで、配列の要素の数だけループ処理を繰り返すことができます。" },
+                    { label: "イ", choices: ["i", "tensu", "tensu[i]", "len(tensu)"], answer: 3, explanation: "ループ変数 i は 0 から順に増えていくため、tensu[i] と記述することで、配列の要素を先頭から1つずつ順番に取り出すことができます。これを変数 goukei に加算していくことで、合計値が求まります。" }
+                ],
+                overallExplanation: "配列（リスト）に格納されたテストの点数の合計と平均を求めるプログラムです。配列の要素数を取得するには組み込み関数 len() を使い、ループ変数 i を添字にして tensu[i] で要素を順番に取り出します。"
+            },
+            {
+                id: 2,
+                title: "探索のプログラム（線形探索）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：配列の中から特定のデータを探すにはどうすればいいですか？\nT：先頭から順番に、目的の値と一致するかどうかを一つずつ確認していく「線形探索」のプログラムを書いてみましょう。見つかったら反復処理を強制的に抜ける命令を使います。",
+                code: 'a = [<span class="code-number">23</span>, <span class="code-number">57</span>, <span class="code-number">12</span>, <span class="code-number">84</span>, <span class="code-number">35</span>, <span class="code-number">41</span>, <span class="code-number">68</span>, <span class="code-number">90</span>, <span class="code-number">15</span>, <span class="code-number">76</span>]\ns = <span class="code-func">int</span>(<span class="code-func">input</span>(<span class="code-string">"探索値の入力: "</span>))\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-func">len</span>(a)):\n    <span class="code-keyword">if</span> <span class="blank">【 ア 】</span> == s:\n        <span class="code-func">print</span>(s, <span class="code-string">"は"</span>, i, <span class="code-string">"番目に存在します"</span>)\n        <span class="blank">【 イ 】</span>',
+                blanks: [
+                    { label: "ア", sharedLabel: "ア・イ", choices: ["i", "a[i]", "break", "continue", "return"], answer: 2, explanation: "if 文の条件式では、配列 a の i 番目の要素である a[i] と、入力された探索値 s が等しいか（a[i] == s）を判定しています。" },
+                    { label: "イ", sharedLabel: "ア・イ", choices: ["i", "a[i]", "break", "continue", "return"], answer: 3, explanation: "線形探索において目的のデータが見つかった場合、それ以降のデータを探す必要はありません。そのため、break 命令を使って、強制的に反復処理（ループ）から抜け出します。" }
+                ],
+                overallExplanation: "配列の先頭から順番に、目的の値と一致するかどうかを一つずつ確認していく「線形探索」のプログラムです。a[i] で要素を取り出して比較し、見つかったら break でループを抜けます。"
+            },
+            {
+                id: 3,
+                title: "探索のプログラム（二分探索）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：データがたくさんある場合、線形探索より早く探す方法はありますか？\nT：データが昇順に整列されているなら、探索範囲の中央の値と比較して範囲を半分に狭めていく「二分探索」が使えます。",
+                code: 'a = [<span class="code-number">10</span>, <span class="code-number">18</span>, <span class="code-number">25</span>, <span class="code-number">34</span>, <span class="code-number">42</span>, <span class="code-number">57</span>, <span class="code-number">63</span>, <span class="code-number">71</span>, <span class="code-number">86</span>, <span class="code-number">95</span>]\ns = <span class="code-number">57</span>\ni = <span class="code-number">0</span>\nj = <span class="code-func">len</span>(a) - <span class="code-number">1</span>\n<span class="code-keyword">while</span> i <= j:\n    m = (i + j) // <span class="code-number">2</span>\n    <span class="code-keyword">if</span> a[m] == s:\n        <span class="code-func">print</span>(<span class="code-string">"見つかりました"</span>)\n        <span class="code-keyword">break</span>\n    <span class="code-keyword">elif</span> a[m] > s:\n        j = <span class="blank">【 ア 】</span>\n    <span class="code-keyword">else</span>:\n        i = <span class="blank">【 イ 】</span>',
+                blanks: [
+                    { label: "ア", sharedLabel: "ア・イ", choices: ["m", "m - 1", "m + 1", "j - 1", "i + 1"], answer: 2, explanation: "a[m] > s の場合、中央の値よりも探索値の方が小さいため、目的のデータは中央よりも左側（小さい方）にあります。したがって、次の探索範囲の上限の添字 j を m - 1 に更新します。" },
+                    { label: "イ", sharedLabel: "ア・イ", choices: ["m", "m - 1", "m + 1", "j - 1", "i + 1"], answer: 3, explanation: "else の場合、中央の値よりも探索値の方が大きい（a[m] < s）ため、目的のデータは中央よりも右側（大きい方）にあります。したがって、次の探索範囲の下限の添字 i を m + 1 に更新します。" }
+                ],
+                overallExplanation: "昇順に整列されたデータ列から、中央の値と比較して探索範囲を半分に狭めていく「二分探索」のプログラムです。a[m] > s なら上限 j を m-1 に、a[m] < s なら下限 i を m+1 に更新します。"
+            },
+            {
+                id: 4,
+                title: "整列のプログラム（バブルソート / 交換法）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：バラバラのデータを小さい順（昇順）に並べ替えるにはどうすればいいですか？\nT：隣り合うデータを比較し、順番が逆（左の方が大きい）なら入れ替えるという操作を繰り返す「交換法（バブルソート）」を作ってみましょう。変数の値を入れ替えるには、一時的にデータを退避させる作業用変数が必要です。",
+                code: 'a = [<span class="code-number">4</span>, <span class="code-number">2</span>, <span class="code-number">7</span>, <span class="code-number">1</span>, <span class="code-number">5</span>, <span class="code-number">3</span>]\nn = <span class="code-func">len</span>(a)\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">0</span>, n - <span class="code-number">1</span>, <span class="code-number">1</span>):\n    <span class="code-keyword">for</span> j <span class="code-keyword">in</span> <span class="code-func">range</span>(n - <span class="code-number">2</span>, i - <span class="code-number">1</span>, -<span class="code-number">1</span>):\n        <span class="code-keyword">if</span> a[j] > a[j + <span class="code-number">1</span>]:\n            temp = <span class="blank">【 ア 】</span>\n            <span class="blank">【 ア 】</span> = a[j + <span class="code-number">1</span>]\n            a[j + <span class="code-number">1</span>] = <span class="blank">【 イ 】</span>',
+                blanks: [
+                    { label: "ア", sharedLabel: "ア・イ", choices: ["a[i]", "a[j]", "temp", "n"], answer: 2, explanation: "まず temp = a[j] で a[j] の値を temp に一時保存します。次に a[j] = a[j+1] で右側の値を左側に上書き代入します。" },
+                    { label: "イ", sharedLabel: "ア・イ", choices: ["a[i]", "a[j]", "temp", "n"], answer: 3, explanation: "最後に a[j+1] = temp で、退避しておいた temp の値を右側に代入することで、2つの値の入れ替えが完了します。" }
+                ],
+                overallExplanation: "隣り合うデータの大小を比較し、順番が逆なら入れ替える操作を繰り返す「交換法（バブルソート）」のプログラムです。変数の値を入れ替える際は、作業用変数 temp を使って一時的にデータを退避させます。"
+            },
+            {
+                id: 5,
+                title: "モデル化とシミュレーション（モンテカルロ法）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：乱数を使って円周率を求めることができると聞きました。\nT：モンテカルロ法ですね。1辺が1の正方形の中にランダムに点を打ち、そのうち原点を中心とした半径1の四分円の中に入った点の割合から円周率を近似します。",
+                code: '<span class="code-keyword">import</span> random\nn = <span class="code-number">5000</span>\ncount = <span class="code-number">0</span>\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(n):\n    x = random.<span class="code-func">random</span>()\n    y = random.<span class="code-func">random</span>()\n    <span class="code-keyword">if</span> <span class="blank">【 ア 】</span> <= <span class="code-number">1.0</span>:\n        count = count + <span class="code-number">1</span>\npi = <span class="blank">【 イ 】</span> * count / n\n<span class="code-func">print</span>(<span class="code-string">"円周率 ="</span>, pi)',
+                blanks: [
+                    { label: "ア", choices: ["x + y", "x * y", "x * x + y * y", "(x + y) * 2"], answer: 3, explanation: "三平方の定理より、原点からの距離の2乗（x² + y²）が1以下であれば、四分円の内部（または円周上）にあると判定できます。したがって、条件式は x * x + y * y <= 1.0 となります。" },
+                    { label: "イ", choices: ["2.0", "3.14", "4.0", "1.0"], answer: 3, explanation: "正方形の面積は1、1/4円の面積はπ/4です。ランダムに打った点が円の中に入った割合（確率）は四分円の面積の割合に等しいため、得られた割合に 4.0 を掛けることで、円周率（π）の近似値を求めることができます。" }
+                ],
+                overallExplanation: "乱数を用いて円周率を近似的に求める「モンテカルロ法」のプログラムです。1辺が1の正方形の中にランダムに点を打ち、x²+y²≤1.0 で四分円内か判定し、その割合に4.0を掛けてπを求めます。"
+            },
+            {
+                id: 6,
+                title: "配列と反復処理（条件に合う要素の合計）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：配列に格納されたデータの中から、偶数番目（インデックスが偶数）のデータだけを取り出して合計するプログラムを作りたいです。\nT：for文を使って配列の要素を順番に確認し、添字（インデックス）を2で割った余りが0かどうかを判定する条件分岐を組み合わせるとよいですね。",
+                code: 'Data = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>, <span class="code-number">4</span>, <span class="code-number">5</span>, <span class="code-number">6</span>, <span class="code-number">7</span>, <span class="code-number">8</span>]\ngoukei = <span class="code-number">0</span>\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-func">len</span>(Data)):\n    <span class="code-keyword">if</span> <span class="blank">【 ア 】</span> == <span class="code-number">0</span>:\n        goukei = goukei + <span class="blank">【 イ 】</span>\n\n<span class="code-func">print</span>(<span class="code-string">"合計は"</span>, goukei)',
+                blanks: [
+                    { label: "ア", choices: ["Data[i] % 2", "i % 2", "len(Data) % 2", "goukei % 2"], answer: 2, explanation: "偶数番目（インデックスが0, 2, 4...）のデータを取り出すため、添字である変数 i を2で割った余りが0であるかを判定します。Data[i] % 2 としてしまうと「配列の中身の値が偶数かどうか」の判定になってしまいます。" },
+                    { label: "イ", choices: ["i", "1", "Data[i]", "len(Data)"], answer: 3, explanation: "条件を満たした場合、変数 goukei にその要素の値 Data[i] を加算して上書き保存します。" }
+                ],
+                overallExplanation: "配列に格納されたデータの中から、偶数番目（インデックスが偶数）のデータだけを取り出して合計するプログラムです。添字 i を2で割った余りで判定し、条件を満たした要素 Data[i] を加算します。"
+            },
+            {
+                id: 7,
+                title: "探索のプログラム（線形探索・個数のカウント）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：探索値が配列の中に「何個」存在するかを数えるプログラムを作りたいです。\nT：線形探索の応用ですね。途中で break を使ってループを抜けず、最後まで探索を続けて、見つかるたびにカウント用の変数を増やしていきましょう。",
+                code: 'Data = [<span class="code-number">2</span>, <span class="code-number">9</span>, <span class="code-number">3</span>, <span class="code-number">5</span>, <span class="code-number">9</span>, <span class="code-number">2</span>, <span class="code-number">9</span>]\natai = <span class="code-func">int</span>(<span class="code-func">input</span>(<span class="code-string">"探索値を入力してください: "</span>))\nkosu = <span class="code-number">0</span>\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-func">len</span>(Data)):\n    <span class="code-keyword">if</span> <span class="blank">【 ア 】</span> == atai:\n        kosu = <span class="blank">【 イ 】</span>\n\n<span class="code-keyword">if</span> kosu > <span class="code-number">0</span>:\n    <span class="code-func">print</span>(atai, <span class="code-string">"は"</span>, kosu, <span class="code-string">"個見つかりました"</span>)\n<span class="code-keyword">else</span>:\n    <span class="code-func">print</span>(<span class="code-string">"見つかりませんでした"</span>)',
+                blanks: [
+                    { label: "ア", choices: ["i", "Data[i]", "Data[atai]", "kosu"], answer: 2, explanation: "配列の i 番目の要素 Data[i] と、入力された探索値 atai が等しいかを判定します。" },
+                    { label: "イ", choices: ["kosu + 1", "kosu + Data[i]", "i + 1", "atai + 1"], answer: 1, explanation: "今回は「個数」を数えるため break は使いません。見つかるたびに、個数を数えるための変数 kosu に 1 を足して更新（カウントアップ）します。" }
+                ],
+                overallExplanation: "探索値が配列の中に何個存在するかを数える線形探索の応用プログラムです。Data[i] で要素を取り出して比較し、見つかるたびに kosu を1ずつ増やします。break は使わず最後まで探索します。"
+            },
+            {
+                id: 8,
+                title: "探索のプログラム（二分探索・降順）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：データが「大きい順（降順）」に並んでいる場合の二分探索を作ってみました。昇順のときと比べて、探索範囲の絞り込み方をどう変えればいいか悩んでいます。\nT：降順の場合、中央値が探索値より「大きい」なら、目的のデータは中央値より「右側（後方）」にあることになりますね。",
+                code: 'a = [<span class="code-number">95</span>, <span class="code-number">82</span>, <span class="code-number">71</span>, <span class="code-number">63</span>, <span class="code-number">50</span>, <span class="code-number">38</span>, <span class="code-number">24</span>, <span class="code-number">16</span>, <span class="code-number">7</span>]\ns = <span class="code-number">16</span>\ni = <span class="code-number">0</span>\nj = <span class="code-func">len</span>(a) - <span class="code-number">1</span>\n\n<span class="code-keyword">while</span> i <= j:\n    m = (i + j) // <span class="code-number">2</span>\n    <span class="code-keyword">if</span> a[m] == s:\n        <span class="code-func">print</span>(m, <span class="code-string">"番目に見つかりました"</span>)\n        <span class="code-keyword">break</span>\n    <span class="code-keyword">elif</span> a[m] > s:\n        i = <span class="blank">【 ア 】</span>\n    <span class="code-keyword">else</span>:\n        j = <span class="blank">【 イ 】</span>',
+                blanks: [
+                    { label: "ア", sharedLabel: "ア・イ", choices: ["m + 1", "m - 1", "m", "i + 1", "j - 1"], answer: 1, explanation: "データが降順に並んでいる場合、a[m] > s なら探索値は中央値より右側（添字が大きい方、より小さい値が並ぶ方）にあります。したがって下限 i を m + 1 に更新します。" },
+                    { label: "イ", sharedLabel: "ア・イ", choices: ["m + 1", "m - 1", "m", "i + 1", "j - 1"], answer: 2, explanation: "逆に a[m] < s なら探索値は中央値より左側（添字が小さい方、より大きい値が並ぶ方）にあるため、上限 j を m - 1 に更新します。" }
+                ],
+                overallExplanation: "データが降順（大きい順）に並んでいる場合の二分探索です。昇順の場合と探索範囲の絞り込み方が逆になります。a[m] > s なら i = m + 1、a[m] < s なら j = m - 1 に更新します。"
+            },
+            {
+                id: 9,
+                title: "整列のプログラム（選択ソート）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：バブルソートとは別の並べ替えアルゴリズムに挑戦したいです。\nT：未整列のデータ全体の中から「一番小さな値」を探し出し、それを未整列の先頭の要素と交換していく「選択ソート」を作ってみましょう。",
+                code: 'Data = [<span class="code-number">9</span>, <span class="code-number">11</span>, <span class="code-number">5</span>, <span class="code-number">3</span>, <span class="code-number">7</span>]\nn = <span class="code-func">len</span>(Data)\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">0</span>, n - <span class="code-number">1</span>, <span class="code-number">1</span>):\n    min_idx = <span class="blank">【 ア 】</span>\n    <span class="code-keyword">for</span> j <span class="code-keyword">in</span> <span class="code-func">range</span>(i + <span class="code-number">1</span>, n, <span class="code-number">1</span>):\n        <span class="code-keyword">if</span> Data[min_idx] > Data[j]:\n            min_idx = <span class="blank">【 イ 】</span>\n    hokan = Data[i]\n    Data[i] = Data[min_idx]\n    Data[min_idx] = hokan\n\n<span class="code-func">print</span>(Data)',
+                blanks: [
+                    { label: "ア", sharedLabel: "ア・イ", choices: ["i", "j", "n", "hokan"], answer: 1, explanation: "各周回の探索を始める際、まずは未整列部分の先頭の添字である i を、仮の最小値のインデックス min_idx として設定します。" },
+                    { label: "イ", sharedLabel: "ア・イ", choices: ["i", "j", "n", "hokan"], answer: 2, explanation: "内側のループで残りのデータと比較していき、現在の仮の最小値 Data[min_idx] よりも小さい値 Data[j] が見つかった場合、最小値のインデックスをその見つかった場所 j に更新します。" }
+                ],
+                overallExplanation: "未整列のデータ全体の中から最小値を探し出し、先頭の要素と交換していく「選択ソート」のプログラムです。仮の最小値のインデックスを i で初期化し、より小さい値が見つかったら j で更新します。"
+            },
+            {
+                id: 10,
+                title: "選択構造と反復処理（FizzBuzz問題）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：1から100までの数字を表示するとき、3の倍数なら「Fizz」、5の倍数なら「Buzz」、15の倍数なら「FizzBuzz」と表示する有名な問題を作ってみました。\nT：分岐の順番に気をつけないと、15の倍数のときに正しく表示されなくなってしまいますよ。",
+                code: '<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">1</span>, <span class="code-number">101</span>):\n    <span class="code-keyword">if</span> <span class="blank">【 ア 】</span> == <span class="code-number">0</span>:\n        <span class="code-func">print</span>(<span class="code-string">"FizzBuzz"</span>)\n    <span class="code-keyword">elif</span> i % <span class="code-number">3</span> == <span class="code-number">0</span>:\n        <span class="code-func">print</span>(<span class="code-string">"Fizz"</span>)\n    <span class="code-keyword">elif</span> <span class="blank">【 イ 】</span> == <span class="code-number">0</span>:\n        <span class="code-func">print</span>(<span class="code-string">"Buzz"</span>)\n    <span class="code-keyword">else</span>:\n        <span class="code-func">print</span>(i)',
+                blanks: [
+                    { label: "ア", choices: ["i % 3", "i % 5", "i % 15", "i // 15"], answer: 3, explanation: "if-elif の分岐構造では上から順に判定されます。もし3の倍数や5の倍数を先に判定すると、15の倍数のときもそこで条件を満たしてしまい「FizzBuzz」が表示されません。最も厳しい条件である「15の倍数」を最初に判定する必要があります。" },
+                    { label: "イ", choices: ["i % 3", "i % 5", "i % 15", "i // 5"], answer: 2, explanation: "アで15の倍数を、次に3の倍数を判定しているため、イの残りの条件として「5の倍数」の判定（i % 5）を行います。" }
+                ],
+                overallExplanation: "FizzBuzz問題では、if-elif の分岐順序が重要です。最も厳しい条件（15の倍数）を最初に判定し、次に3の倍数、5の倍数の順に判定します。"
+            },
+            {
+                id: 11,
+                title: "配列の操作（最大値の探索）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：配列の中に入っているデータの中から、一番大きい値（最大値）を見つけ出すにはどうすればいいですか？\nT：まず配列の先頭のデータを「仮の最大値」として変数に記憶させ、順番に比較して、より大きいデータが出てきたら変数を上書きしていく手法を使います。",
+                code: 'a = [<span class="code-number">23</span>, <span class="code-number">57</span>, <span class="code-number">12</span>, <span class="code-number">84</span>, <span class="code-number">35</span>, <span class="code-number">41</span>]\nmax_val = a[<span class="code-number">0</span>]\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">1</span>, <span class="code-func">len</span>(a)):\n    <span class="code-keyword">if</span> <span class="blank">【 ア 】</span>:\n        max_val = <span class="blank">【 イ 】</span>\n\n<span class="code-func">print</span>(<span class="code-string">"最大値は"</span>, max_val)',
+                blanks: [
+                    { label: "ア", choices: ["a[i] == max_val", "a[i] < max_val", "a[i] > max_val"], answer: 3, explanation: "現在記憶している仮の最大値 max_val よりも、今比較している配列の要素 a[i] の方が大きいかどうかを判定します。" },
+                    { label: "イ", choices: ["i", "a[i]", "a", "max_val + 1"], answer: 2, explanation: "条件を満たした（より大きい値が見つかった）場合は、その値 a[i] を新しい最大値として変数 max_val に上書き代入します。これを配列の最後まで繰り返すことで、最終的に一番大きい値が残ります。" }
+                ],
+                overallExplanation: "配列の中から最大値を探すプログラムです。先頭要素を仮の最大値とし、a[i] > max_val なら max_val を a[i] で更新していきます。"
+            },
+            {
+                id: 12,
+                title: "確率のシミュレーション（サイコロの目と配列）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：サイコロを1000回投げて、1から6までの目が出る確率をそれぞれ求めるシミュレーションを作りたいです。\nT：出た目の回数を記録するために、要素数が6個の配列 kaisu を用意しましょう。配列の添字は0から5になるので、出た目と添字の対応に注意してください。",
+                code: '<span class="code-keyword">import</span> random\nkaisu = [<span class="code-number">0</span>, <span class="code-number">0</span>, <span class="code-number">0</span>, <span class="code-number">0</span>, <span class="code-number">0</span>, <span class="code-number">0</span>]\nn = <span class="code-number">1000</span>\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(n):\n    deme = random.<span class="code-func">randint</span>(<span class="code-number">1</span>, <span class="code-number">6</span>)\n    kaisu[ <span class="blank">【 ア 】</span> ] = kaisu[ <span class="blank">【 ア 】</span> ] + <span class="code-number">1</span>\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">6</span>):\n    kakuritsu = <span class="blank">【 イ 】</span> / n\n    <span class="code-func">print</span>(i + <span class="code-number">1</span>, <span class="code-string">"の目の確率:"</span>, kakuritsu)',
+                blanks: [
+                    { label: "ア", choices: ["i", "deme", "deme - 1", "deme + 1"], answer: 3, explanation: "出た目（deme）は 1〜6 ですが、配列 kaisu の添字は 0〜5 です。例えば「1」の目が出たときは添字「0」に記録したいため、インデックスは deme - 1 となります。" },
+                    { label: "イ", choices: ["i", "kaisu[i]", "deme", "n"], answer: 2, explanation: "各目の確率は「その目が出た回数 ÷ 全体の試行回数」で求まります。i 番目（表示上は i+1 の目）が出た回数は kaisu[i] に記録されています。" }
+                ],
+                overallExplanation: "サイコロを繰り返し投げて各目の確率を求めるシミュレーションです。出た目(1〜6)と配列の添字(0〜5)のずれに注意し、deme - 1 で記録します。確率は kaisu[i] / n で求めます。"
+            },
+            {
+                id: 13,
+                title: "状態遷移とプログラム（自動販売機）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：150円の商品を売る自動販売機の仕組みを、状態遷移の考え方でプログラムにしたいです。\nT：投入されたお金の「累計金額」を変数 s として状態を管理します。商品が出た後や、お釣りが出た後は、状態を初期値に戻す必要があります。",
+                code: 's = <span class="code-number">0</span>\n<span class="code-keyword">while</span> <span class="code-keyword">True</span>:\n    x = <span class="code-func">int</span>(<span class="code-func">input</span>(<span class="code-string">"金額入力(50か100、終了は0): "</span>))\n    <span class="code-keyword">if</span> x == <span class="code-number">0</span>:\n        <span class="code-keyword">break</span>\n    <span class="code-keyword">if</span> s == <span class="code-number">0</span> <span class="code-keyword">and</span> x == <span class="code-number">50</span>:\n        s = <span class="code-number">50</span>\n    <span class="code-keyword">elif</span> (s == <span class="code-number">50</span> <span class="code-keyword">and</span> x == <span class="code-number">50</span>) <span class="code-keyword">or</span> (s == <span class="code-number">0</span> <span class="code-keyword">and</span> x == <span class="code-number">100</span>):\n        s = <span class="code-number">100</span>\n    <span class="code-keyword">elif</span> (s == <span class="code-number">50</span> <span class="code-keyword">and</span> x == <span class="code-number">100</span>) <span class="code-keyword">or</span> (s == <span class="code-number">100</span> <span class="code-keyword">and</span> x == <span class="code-number">50</span>):\n        <span class="code-func">print</span>(<span class="code-string">"商品排出"</span>)\n        s = <span class="blank">【 ア 】</span>\n    <span class="code-keyword">elif</span> <span class="blank">【 イ 】</span>:\n        <span class="code-func">print</span>(<span class="code-string">"商品と釣銭50円排出"</span>)\n        s = <span class="code-number">0</span>',
+                blanks: [
+                    { label: "ア", choices: ["0", "50", "100", "150"], answer: 1, explanation: "商品が排出された後は、次の購入に備えて状態（累計金額）を初期状態に戻す必要があります。したがって、変数 s には 0 を代入します。" },
+                    { label: "イ", choices: ["s == 50 and x == 100", "s == 100 and x == 100", "s == 150 and x == 0"], answer: 2, explanation: "商品と釣銭50円が排出されるのは、合計が200円になったときです。つまり、累計金額が100円（s == 100）の状態で100円硬貨（x == 100）が投入された場合です。" }
+                ],
+                overallExplanation: "150円の自動販売機を状態遷移で実現するプログラムです。商品排出後は s = 0 で初期化し、s == 100 かつ x == 100（合計200円）で商品と釣銭50円を排出します。"
+            },
+            {
+                id: 14,
+                title: "二次元配列の操作",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：表のような2次元配列のデータから、左上から右下へ斜めに並ぶデータ（対角成分）だけを足し合わせたいです。\nT：2重の for 文を使って行と列を移動し、行の添字と列の添字が「同じ」要素だけを加算すればよいですね。",
+                code: 'Zahyou = [[<span class="code-number">3</span>, <span class="code-number">5</span>, <span class="code-number">2</span>],\n          [<span class="code-number">8</span>, <span class="code-number">1</span>, <span class="code-number">4</span>],\n          [<span class="code-number">6</span>, <span class="code-number">7</span>, <span class="code-number">9</span>]]\ngoukei = <span class="code-number">0</span>\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">3</span>):\n    <span class="code-keyword">for</span> j <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">3</span>):\n        <span class="code-keyword">if</span> i == j:\n            goukei = goukei + Zahyou[<span class="blank">【 ア 】</span>][<span class="blank">【 イ 】</span>]\n\n<span class="code-func">print</span>(goukei)',
+                blanks: [
+                    { label: "ア", sharedLabel: "ア・イ", choices: ["0", "1", "i", "j"], answer: 3, explanation: "二次元配列の要素にアクセスするには Zahyou[行][列] と記述します。外側のループ変数 i が行の働きをしているため、行の添字は i です。" },
+                    { label: "イ", sharedLabel: "ア・イ", choices: ["0", "1", "i", "j"], answer: 4, explanation: "内側のループ変数 j が列の働きをしているため、列の添字は j です。if i == j の条件により、対角成分（例：Zahyou[0][0]、Zahyou[1][1] など）のみが加算されます。" }
+                ],
+                overallExplanation: "二次元配列の対角成分を合計するプログラムです。Zahyou[i][j] で要素にアクセスし、i == j の条件で対角成分のみを加算します。"
+            },
+            {
+                id: 15,
+                title: "シミュレーション（ランダムウォーク）",
+                description: "次の生徒（S）と先生（T）の会話文を読み、空欄【 ア 】・【 イ 】に入れるのに最も適当なものを、後の解答群のうちから一つずつ選べ。\n\nS：座標平面上で、点が上下左右にランダムに移動していく「ランダムウォーク」のシミュレーションを作りたいです。\nT：1から4の乱数を発生させ、出た値によって x 座標か y 座標を変化させる条件分岐を作ります。ここでは、「1:右、2:上、3:左、4:下」に移動するものとします。",
+                code: '<span class="code-keyword">import</span> random\nx = <span class="code-number">0</span>\ny = <span class="code-number">0</span>\n\n<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-func">range</span>(<span class="code-number">10</span>):\n    r = random.<span class="code-func">randint</span>(<span class="code-number">1</span>, <span class="code-number">4</span>)\n    <span class="code-keyword">if</span> r == <span class="code-number">1</span>:\n        x = x + <span class="code-number">1</span>\n    <span class="code-keyword">elif</span> r == <span class="code-number">2</span>:\n        y = y + <span class="code-number">1</span>\n    <span class="code-keyword">elif</span> r == <span class="code-number">3</span>:\n        x = <span class="blank">【 ア 】</span>\n    <span class="code-keyword">else</span>:\n        y = <span class="blank">【 イ 】</span>\n\n<span class="code-func">print</span>(<span class="code-string">"最終座標:"</span>, x, <span class="code-string">","</span>, y)',
+                blanks: [
+                    { label: "ア", sharedLabel: "ア・イ", choices: ["x + 1", "x - 1", "y + 1", "y - 1"], answer: 2, explanation: "乱数 r が3のときは「左」への移動です。座標平面上で左に移動するということは、現在の x 座標を 1 減らすことになるため、x - 1 を代入します。" },
+                    { label: "イ", sharedLabel: "ア・イ", choices: ["x + 1", "x - 1", "y + 1", "y - 1"], answer: 4, explanation: "else（乱数 r が4のとき）は「下」への移動です。下に移動するということは、現在の y 座標を 1 減らすことになるため、y - 1 を代入します。" }
+                ],
+                overallExplanation: "座標平面上で点がランダムに移動する「ランダムウォーク」のシミュレーションです。右(x+1)、上(y+1)、左(x-1)、下(y-1)の4方向に乱数で移動します。"
+            }
+        ];
+
+        const CHOICE_NUMS = ["①", "②", "③", "④", "⑤"];
+
+        /* ============================================================
+           SCREEN MANAGEMENT
+           ============================================================ */
+        function showScreen(name) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + name).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goHome() {
+            document.querySelector('.app-container').classList.remove('wide-mode');
+            showScreen('intro');
+        }
+
+        /* ============================================================
+           INTRO
+           ============================================================ */
+        function buildIntro() {
+            const list = document.getElementById('problemList');
+            list.innerHTML = '<h3>📋 出題内容</h3>' + questions.map(q =>
+                `<div class="problem-list-item"><span class="pl-num">${q.id}</span><span class="pl-title">${q.title}</span></div>`
+            ).join('');
+        }
+        buildIntro();
+
+        /* ============================================================
+           QUIZ STATE
+           ============================================================ */
+        let currentQIdx = 0;
+        let blankAnswers = {}; // { "1-0": selectedIdx, ... }
+        let totalCorrect = 0;
+        let totalBlanks = 0;
+        let answersLog = [];
+
+        function startQuiz() {
+            currentQIdx = 0;
+            blankAnswers = {};
+            totalCorrect = 0;
+            totalBlanks = questions.reduce((s, q) => s + q.blanks.length, 0);
+            answersLog = [];
+            renderQuestion();
+            showScreen('quiz');
+        }
+
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQIdx];
+            const total = questions.length;
+            const progressPct = (currentQIdx / total) * 100;
+            const hasAnswerData = q.blanks.every(b => b.answer !== null);
+
+            const descLines = q.description.split('\n').map(l => escapeHtml(l)).join('<br>');
+
+            let blanksHtml = '';
+            q.blanks.forEach((blank, bi) => {
+                const key = q.id + '-' + bi;
+                const isAnswered = blankAnswers[key] !== undefined;
+                const sharedLabel = blank.sharedLabel || blank.label;
+                blanksHtml += `
+        <div class="blank-group">
+            <div class="blank-group-label"><span class="blank-tag">【 ${blank.label} 】</span>の解答群</div>
+            ${blank.sharedLabel && bi === 0 ? `<div class="blank-group-sublabel">※【 ${sharedLabel} 】は共通の解答群です</div>` : ''}
+            <div class="blank-choices">
+                ${blank.choices.map((c, ci) => {
+                    let cls = '';
+                    if (isAnswered && hasAnswerData) {
+                        if (ci + 1 === blank.answer) cls = 'correct';
+                        else if (ci + 1 === blankAnswers[key]) cls = 'incorrect';
+                    }
+                    return `<button class="blank-choice-btn ${cls}" data-key="${key}" data-idx="${ci + 1}" onclick="handleBlankSelect('${key}',${ci + 1},${bi})" ${isAnswered ? 'disabled' : ''}>
+                        <span class="choice-num">${CHOICE_NUMS[ci]}</span><span>${escapeHtml(c)}</span>
+                    </button>`;
+                }).join('')}
+            </div>
+        </div>`;
+            });
+
+            if (!hasAnswerData) {
+                blanksHtml = `<div class="disabled-notice">⚠️ 解答データは準備中です。選択肢を押しても正誤判定は行われません。</div>` + blanksHtml;
+            }
+
+            const allBlanksDone = q.blanks.every((_, bi) => blankAnswers[q.id + '-' + bi] !== undefined);
+
+            const area = document.getElementById('quizArea');
+            area.innerHTML = `
+    <div class="quiz-header">
+        <div class="question-counter">大問 <span>${currentQIdx + 1}</span> / ${total}</div>
+        <button class="back-btn" onclick="goHome()">← トップへ</button>
+    </div>
+    <div class="progress-bar-wrapper"><div class="progress-bar-fill" style="width:${progressPct}%"></div></div>
+    <div class="quiz-split">
+        <div class="quiz-split-left">
+            <div class="question-card">
+                <div class="question-number-badge">📝 問題 ${q.id}</div>
+                <div class="question-title">${escapeHtml(q.title)}</div>
+                <div class="question-desc">${descLines}</div>
+                <div class="code-block"><pre>${q.code}</pre></div>
+            </div>
+        </div>
+        <div class="quiz-split-right">
+            ${blanksHtml}
+            <div id="feedbackArea"></div>
+            ${allBlanksDone ? `<button class="next-btn" onclick="handleNextQuestion()">${currentQIdx + 1 >= total ? '結果を見る 🏆' : '次の大問へ →'}</button>` : ''}
+        </div>
+    </div>
+    `;
+            document.querySelector('.app-container').classList.add('wide-mode');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleBlankSelect(key, choiceIdx, blankIdx) {
+            if (blankAnswers[key] !== undefined) return;
+            blankAnswers[key] = choiceIdx;
+
+            const q = questions[currentQIdx];
+            const blank = q.blanks[blankIdx];
+            const hasAnswerData = blank.answer !== null;
+
+            if (hasAnswerData) {
+                const correct = choiceIdx === blank.answer;
+                if (correct) {
+                    totalCorrect++;
+                    confetti({ particleCount: 40, spread: 45, origin: { y: 0.7 }, colors: ['#22d3ee', '#34d399', '#a78bfa'], disableForReducedMotion: true });
+                }
+                answersLog.push({ questionId: q.id, blankLabel: blank.label, selected: choiceIdx, answer: blank.answer, correct });
+
+                // Update button styles
+                document.querySelectorAll(`.blank-choice-btn[data-key="${key}"]`).forEach(btn => {
+                    const idx = parseInt(btn.dataset.idx);
+                    btn.disabled = true;
+                    if (idx === blank.answer) btn.classList.add('correct');
+                    else if (idx === choiceIdx) btn.classList.add('incorrect');
+                });
+            } else {
+                // No answer data - just mark as selected
+                document.querySelectorAll(`.blank-choice-btn[data-key="${key}"]`).forEach(btn => {
+                    btn.disabled = true;
+                    if (parseInt(btn.dataset.idx) === choiceIdx) btn.style.borderColor = 'var(--accent-cyan)';
+                });
+            }
+
+            // Check if all blanks for this question are answered
+            const allDone = q.blanks.every((_, bi) => blankAnswers[q.id + '-' + bi] !== undefined);
+            if (allDone) {
+                const total = questions.length;
+                const pct = ((currentQIdx + 1) / total) * 100;
+                const fill = document.querySelector('.progress-bar-fill');
+                if (fill) fill.style.width = pct + '%';
+
+                const nextArea = document.getElementById('feedbackArea');
+                if (nextArea) {
+                    nextArea.innerHTML = `<button class="next-btn" onclick="handleNextQuestion()">${currentQIdx + 1 >= total ? '結果を見る 🏆' : '次の大問へ →'}</button>`;
+                }
+            }
+        }
+
+        function handleNextQuestion() {
+            if (currentQIdx + 1 >= questions.length) {
+                showResult();
+            } else {
+                currentQIdx++;
+                renderQuestion();
+            }
+        }
+
+        /* ============================================================
+           RESULT
+           ============================================================ */
+        function showResult() {
+            document.querySelector('.app-container').classList.remove('wide-mode');
+            const total = totalBlanks;
+            const pct = total > 0 ? Math.round((totalCorrect / total) * 100) : 0;
+            const hasData = questions.some(q => q.blanks.some(b => b.answer !== null));
+
+            const area = document.getElementById('resultArea');
+            area.innerHTML = `
+    <div class="result-card">
+        <div class="result-icon">🏁</div>
+        <h2 class="result-title good">お疲れさまでした！</h2>
+        <p class="result-subtitle">全${questions.length}問の回答が完了しました</p>
+        ${hasData ? `
+        <div class="stats-grid">
+            <div class="stat-item correct-stat"><div class="stat-icon">✅</div><div class="stat-value">${totalCorrect}</div><div class="stat-label">正解</div></div>
+            <div class="stat-item incorrect-stat"><div class="stat-icon">❌</div><div class="stat-value">${total - totalCorrect}</div><div class="stat-label">不正解</div></div>
+            <div class="stat-item rate-stat"><div class="stat-icon">📊</div><div class="stat-value">${totalCorrect}/${total}</div><div class="stat-label">スコア</div></div>
+        </div>` : `
+        <div class="disabled-notice" style="text-align:left">⚠️ 模範解答データが未設定のため、正誤判定は行われませんでした。解答データが追加され次第、自動採点が有効になります。</div>`}
+    </div>
+    <div class="result-actions">
+        <button class="retry-btn" onclick="startQuiz()">🔄 もう一度チャレンジ</button>
+        <button class="start-btn answers" onclick="showAnswers()" style="max-width:300px">📖 模範解答・解説を見る</button>
+        <button class="home-btn" onclick="goHome()">🏠 トップに戻る</button>
+    </div>`;
+            showScreen('result');
+        }
+
+        /* ============================================================
+           ANSWERS / EXPLANATIONS
+           ============================================================ */
+        function showAnswers() {
+            const area = document.getElementById('answersArea');
+            let html = `
+    <button class="back-btn" onclick="goHome()">← トップに戻る</button>
+    <div class="answers-header">
+        <h2>📖 模範解答・解説</h2>
+        <p>全${questions.length}問の解答と解説です</p>
+    </div>`;
+
+            questions.forEach(q => {
+                const hasData = q.blanks.some(b => b.answer !== null);
+                html += `
+        <div class="answer-card">
+            <div class="answer-card-header">
+                <span class="answer-card-num">${q.id}</span>
+                <span class="answer-card-title">${escapeHtml(q.title)}</span>
+            </div>
+            <div class="code-block" style="margin-bottom:16px"><pre>${q.code}</pre></div>`;
+
+                q.blanks.forEach(blank => {
+                    const hasBlankData = blank.answer !== null;
+                    html += `
+            <div class="answer-blank-item">
+                <div class="answer-blank-label"><span class="abl-tag">【 ${blank.label} 】</span></div>
+                ${hasBlankData ? `
+                <div class="answer-correct-row">
+                    <span class="answer-correct-badge">正解</span>
+                    <span class="answer-correct-text">${CHOICE_NUMS[blank.answer - 1]} ${escapeHtml(blank.choices[blank.answer - 1])}</span>
+                </div>
+                ${blank.explanation ? `<div class="answer-explanation-text">${escapeHtml(blank.explanation)}</div>` : ''}
+                ` : `<div class="placeholder-msg">📌 模範解答・解説は後日追加予定です</div>`}
+            </div>`;
+                });
+
+                if (q.overallExplanation) {
+                    html += `<div class="answer-overall"><h4>💡 解説</h4><p>${escapeHtml(q.overallExplanation)}</p></div>`;
+                } else if (!hasData) {
+                    html += `<div class="answer-overall"><h4>💡 解説</h4><p class="placeholder-msg" style="margin:0">📌 全体の解説は後日追加予定です</p></div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            html += `<button class="back-btn" onclick="goHome()" style="margin-top:0;margin-bottom:40px">← トップに戻る</button>`;
+            area.innerHTML = html;
+            showScreen('answers');
+        }
+    </script>
+</body>
+
+</html>
