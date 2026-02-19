@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイズアプリ v2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2035;
+            --bg-card-hover: #212b45;
+            --surface-glass: rgba(255, 255, 255, .04);
+            --accent-cyan: #22d3ee;
+            --accent-cyan-glow: rgba(34, 211, 238, .3);
+            --accent-pink: #f472b6;
+            --accent-pink-glow: rgba(244, 114, 182, .3);
+            --accent-purple: #a78bfa;
+            --accent-purple-glow: rgba(167, 139, 250, .3);
+            --accent-green: #34d399;
+            --accent-green-glow: rgba(52, 211, 153, .4);
+            --accent-red: #fb7185;
+            --accent-red-glow: rgba(251, 113, 133, .4);
+            --accent-yellow: #fbbf24;
+            --accent-orange: #fb923c;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255, 255, 255, .06);
+            --border-glow: rgba(34, 211, 238, .2);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, .3);
+            --shadow-glow-cyan: 0 0 30px rgba(34, 211, 238, .15);
+            --shadow-glow-green: 0 0 30px rgba(52, 211, 153, .2);
+            --shadow-glow-red: 0 0 30px rgba(251, 113, 133, .2)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden
+        }
+
+        .bg-orbs .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .3;
+            animation: float 20s ease-in-out infinite
+        }
+
+        .bg-orbs .orb:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-cyan);
+            top: -10%;
+            left: -5%;
+            animation-delay: 0s
+        }
+
+        .bg-orbs .orb:nth-child(2) {
+            width: 350px;
+            height: 350px;
+            background: var(--accent-pink);
+            top: 50%;
+            right: -10%;
+            animation-delay: -7s
+        }
+
+        .bg-orbs .orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-purple);
+            bottom: -5%;
+            left: 30%;
+            animation-delay: -14s
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            25% {
+                transform: translate(30px, -40px) scale(1.05)
+            }
+
+            50% {
+                transform: translate(-20px, 20px) scale(.95)
+            }
+
+            75% {
+                transform: translate(40px, 30px) scale(1.02)
+            }
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 720px;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto
+        }
+
+        .screen {
+            display: none;
+            width: 100%
+        }
+
+        .screen.active {
+            display: block
+        }
+
+        /* File Select Screen */
+        .file-select {
+            text-align: center;
+            animation: fadeInUp .6s ease-out
+        }
+
+        .file-select .logo-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: pulse-glow 2s ease-in-out infinite
+        }
+
+        .file-select h1 {
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            line-height: 1.3
+        }
+
+        .file-select .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-glow);
+            border-radius: var(--radius-lg);
+            padding: 48px 28px;
+            margin-bottom: 24px;
+            background: var(--surface-glass);
+            transition: all .3s ease;
+            cursor: pointer;
+            position: relative
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--accent-cyan);
+            background: rgba(34, 211, 238, .06);
+            box-shadow: var(--shadow-glow-cyan)
+        }
+
+        .drop-zone .drop-icon {
+            font-size: 48px;
+            margin-bottom: 12px
+        }
+
+        .drop-zone .drop-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px
+        }
+
+        .drop-zone .drop-hint {
+            font-size: .8rem;
+            color: var(--text-muted)
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer
+        }
+
+        .csv-format-hint {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 18px 22px;
+            text-align: left;
+            margin-top: 16px
+        }
+
+        .csv-format-hint h3 {
+            font-size: .9rem;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .csv-format-hint code {
+            font-size: .75rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            display: block;
+            background: var(--bg-secondary);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            white-space: nowrap
+        }
+
+        .error-msg {
+            color: var(--accent-red);
+            font-size: .85rem;
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(251, 113, 133, .08);
+            border: 1px solid rgba(251, 113, 133, .3);
+            border-radius: var(--radius-sm);
+            display: none
+        }
+
+        .error-msg.show {
+            display: block
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            text-align: center;
+            animation: fadeInUp .6s ease-out
+        }
+
+        .loading-screen .logo-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: pulse-glow 2s ease-in-out infinite
+        }
+
+        .loading-screen h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--surface-glass);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px
+        }
+
+        .loading-text {
+            font-size: .9rem;
+            color: var(--text-muted)
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Intro */
+        .intro {
+            text-align: center;
+            animation: fadeInUp .6s ease-out
+        }
+
+        .intro .logo-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: pulse-glow 2s ease-in-out infinite
+        }
+
+        .intro h1 {
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            line-height: 1.3
+        }
+
+        .intro .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px
+        }
+
+        .intro .info-cards {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap
+        }
+
+        .intro .info-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px
+        }
+
+        .intro .info-card .card-icon {
+            font-size: 28px
+        }
+
+        .intro .info-card .card-label {
+            font-size: .75rem;
+            color: var(--text-muted)
+        }
+
+        .intro .info-card .card-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-cyan)
+        }
+
+        .disclaimer-banner {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            margin: 0 auto 24px;
+            background: rgba(251, 191, 36, .08);
+            border: 2px solid rgba(251, 191, 36, .35);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all .3s ease;
+            text-align: left;
+            animation: banner-pulse 2.5s ease-in-out infinite
+        }
+
+        .disclaimer-banner:hover {
+            background: rgba(251, 191, 36, .14);
+            border-color: rgba(251, 191, 36, .6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(251, 191, 36, .15)
+        }
+
+        .disclaimer-banner-icon {
+            font-size: 28px;
+            flex-shrink: 0
+        }
+
+        .disclaimer-banner-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1
+        }
+
+        .disclaimer-banner-text strong {
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--accent-yellow)
+        }
+
+        .disclaimer-banner-text span {
+            font-size: .78rem;
+            color: var(--text-secondary);
+            line-height: 1.5
+        }
+
+        .disclaimer-banner-arrow {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            flex-shrink: 0;
+            transition: transform .3s ease
+        }
+
+        .disclaimer-banner:hover .disclaimer-banner-arrow {
+            transform: translateX(4px)
+        }
+
+        @keyframes banner-pulse {
+
+            0%,
+            100% {
+                border-color: rgba(251, 191, 36, .35);
+                box-shadow: 0 0 0 rgba(251, 191, 36, 0)
+            }
+
+            50% {
+                border-color: rgba(251, 191, 36, .6);
+                box-shadow: 0 0 16px rgba(251, 191, 36, .1)
+            }
+        }
+
+        .mode-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .mode-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: left;
+            transition: all .3s ease
+        }
+
+        .mode-card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: var(--shadow-glow-cyan)
+        }
+
+        .mode-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px
+        }
+
+        .mode-icon {
+            font-size: 28px
+        }
+
+        .mode-card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .mode-desc {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 12px
+        }
+
+        .mode-meta {
+            display: flex;
+            gap: 16px;
+            font-size: .8rem;
+            color: var(--text-muted);
+            margin-bottom: 16px
+        }
+
+        .start-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 48px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease;
+            box-shadow: 0 4px 20px var(--accent-cyan-glow);
+            overflow: hidden
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, .2) 50%, transparent 60%);
+            transition: transform .5s ease;
+            transform: translateX(-100%)
+        }
+
+        .start-btn:hover::before {
+            transform: translateX(100%)
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--accent-cyan-glow)
+        }
+
+        .start-btn.sequential {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            box-shadow: 0 4px 20px var(--accent-purple-glow)
+        }
+
+        .seq-start-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            font-size: .85rem;
+            color: var(--text-secondary)
+        }
+
+        .seq-start-picker label {
+            white-space: nowrap;
+            font-weight: 600
+        }
+
+        .seq-start-picker select {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: .85rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            appearance: auto;
+            transition: border-color .25s ease
+        }
+
+        .seq-start-picker select:focus {
+            outline: none;
+            border-color: var(--accent-cyan)
+        }
+
+        .change-csv-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 20px;
+            font-size: .82rem;
+            font-weight: 600;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease;
+            margin-top: 8px
+        }
+
+        .change-csv-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-cyan)
+        }
+
+        /* Quiz */
+        .quiz {
+            width: 100%;
+            animation: fadeInUp .4s ease-out
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px
+        }
+
+        .quiz-header .question-counter {
+            font-size: .85rem;
+            color: var(--text-muted)
+        }
+
+        .quiz-header .question-counter span {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--accent-cyan)
+        }
+
+        .quiz-header .score-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: .85rem;
+            color: var(--text-secondary)
+        }
+
+        .quiz-header .score-badge .score-val {
+            font-weight: 700;
+            color: var(--accent-green)
+        }
+
+        .progress-bar-wrapper {
+            width: 100%;
+            height: 6px;
+            background: var(--surface-glass);
+            border-radius: 10px;
+            margin-bottom: 28px;
+            overflow: hidden
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            transition: width .5s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card)
+        }
+
+        .question-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--accent-cyan-glow), var(--accent-purple-glow));
+            border: 1px solid var(--border-glow);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 16px
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.8;
+            color: var(--text-primary)
+        }
+
+        .choices-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px
+        }
+
+        .choice-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            padding: 16px 20px;
+            font-size: .95rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all .25s ease;
+            text-align: left;
+            line-height: 1.6;
+            animation: slide-in-choice .3s ease-out both
+        }
+
+        .choice-btn:nth-child(1) {
+            animation-delay: .05s
+        }
+
+        .choice-btn:nth-child(2) {
+            animation-delay: .1s
+        }
+
+        .choice-btn:nth-child(3) {
+            animation-delay: .15s
+        }
+
+        .choice-btn:nth-child(4) {
+            animation-delay: .2s
+        }
+
+        .choice-btn .choice-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            font-weight: 700;
+            font-size: .85rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            transition: all .25s ease
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-glow-cyan)
+        }
+
+        .choice-btn:hover:not(:disabled) .choice-label {
+            background: var(--accent-cyan-glow);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan)
+        }
+
+        .choice-btn.correct {
+            background: rgba(52, 211, 153, .1);
+            border-color: var(--accent-green);
+            box-shadow: var(--shadow-glow-green)
+        }
+
+        .choice-btn.correct .choice-label {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green)
+        }
+
+        .choice-btn.incorrect {
+            background: rgba(251, 113, 133, .1);
+            border-color: var(--accent-red);
+            box-shadow: var(--shadow-glow-red);
+            animation: shake .5s ease-in-out
+        }
+
+        .choice-btn.incorrect .choice-label {
+            background: var(--accent-red);
+            color: var(--bg-primary);
+            border-color: var(--accent-red)
+        }
+
+        .choice-btn:disabled {
+            cursor: default;
+            opacity: .6
+        }
+
+        .choice-btn.correct:disabled,
+        .choice-btn.incorrect:disabled {
+            opacity: 1
+        }
+
+        .feedback {
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            animation: fadeInUp .4s ease-out
+        }
+
+        .feedback.correct {
+            background: rgba(52, 211, 153, .08);
+            border: 1px solid rgba(52, 211, 153, .3)
+        }
+
+        .feedback.incorrect {
+            background: rgba(251, 113, 133, .08);
+            border: 1px solid rgba(251, 113, 133, .3)
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px
+        }
+
+        .feedback-icon {
+            font-size: 32px;
+            animation: pop-in .4s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        .feedback-title {
+            font-size: 1.2rem;
+            font-weight: 700
+        }
+
+        .feedback.correct .feedback-title {
+            color: var(--accent-green)
+        }
+
+        .feedback.incorrect .feedback-title {
+            color: var(--accent-red)
+        }
+
+        .feedback-explanation {
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 10px
+        }
+
+        .feedback-page {
+            font-size: .8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .next-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all .3s ease;
+            box-shadow: 0 4px 16px var(--accent-cyan-glow)
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px var(--accent-cyan-glow)
+        }
+
+        /* Result */
+        .result {
+            text-align: center;
+            width: 100%;
+            animation: fadeInUp .6s ease-out
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 40px 28px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 24px
+        }
+
+        .result-icon {
+            font-size: 72px;
+            margin-bottom: 12px;
+            animation: pop-in .6s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 6px
+        }
+
+        .result-title.excellent {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .result-title.good {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .result-title.ok {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .result-subtitle {
+            color: var(--text-secondary);
+            font-size: .9rem;
+            margin-bottom: 32px
+        }
+
+        .score-ring-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 28px
+        }
+
+        .score-ring {
+            position: relative;
+            width: 180px;
+            height: 180px
+        }
+
+        .score-ring svg {
+            transform: rotate(-90deg)
+        }
+
+        .score-ring .ring-bg {
+            stroke: var(--surface-glass)
+        }
+
+        .score-ring .ring-fill {
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        .score-ring .ring-fill.excellent {
+            stroke: var(--accent-yellow)
+        }
+
+        .score-ring .ring-fill.good {
+            stroke: var(--accent-cyan)
+        }
+
+        .score-ring .ring-fill.ok {
+            stroke: var(--accent-pink)
+        }
+
+        .score-ring .score-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center
+        }
+
+        .score-ring .score-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--text-primary)
+        }
+
+        .score-ring .score-label {
+            font-size: .75rem;
+            color: var(--text-muted)
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 28px
+        }
+
+        .stat-item {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 12px
+        }
+
+        .stat-icon {
+            font-size: 22px;
+            margin-bottom: 4px
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700
+        }
+
+        .stat-label {
+            font-size: .7rem;
+            color: var(--text-muted)
+        }
+
+        .stat-item.correct-stat .stat-value {
+            color: var(--accent-green)
+        }
+
+        .stat-item.incorrect-stat .stat-value {
+            color: var(--accent-red)
+        }
+
+        .stat-item.rate-stat .stat-value {
+            color: var(--accent-cyan)
+        }
+
+        .encouragement {
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--surface-glass);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle)
+        }
+
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease;
+            box-shadow: 0 4px 20px var(--accent-pink-glow)
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--accent-pink-glow)
+        }
+
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 24px
+        }
+
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 32px;
+            font-size: .95rem;
+            font-weight: 600;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-secondary);
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease
+        }
+
+        .home-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            transform: translateY(-2px)
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            width: 100%;
+            padding-bottom: 40px;
+            animation: fadeInUp .5s ease-out
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 20px;
+            font-size: .85rem;
+            font-weight: 600;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-secondary);
+            background: var(--surface-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all .3s ease;
+            margin-bottom: 20px
+        }
+
+        .back-btn.bottom {
+            margin-top: 20px;
+            margin-bottom: 0
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover)
+        }
+
+        .disclaimer-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            box-shadow: var(--shadow-card)
+        }
+
+        .disclaimer-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--accent-yellow);
+            margin-bottom: 16px;
+            text-align: center
+        }
+
+        .disclaimer-lead {
+            font-size: .9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(251, 191, 36, .06);
+            border: 1px solid rgba(251, 191, 36, .15);
+            border-radius: var(--radius-md)
+        }
+
+        .disclaimer-lead strong {
+            color: var(--accent-yellow)
+        }
+
+        .disclaimer-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle)
+        }
+
+        .disclaimer-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0
+        }
+
+        .disclaimer-section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px
+        }
+
+        .disclaimer-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            font-size: .8rem;
+            font-weight: 800;
+            color: var(--bg-primary);
+            flex-shrink: 0
+        }
+
+        .disclaimer-section-header h3 {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .disclaimer-section ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .disclaimer-section li {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            padding-left: 18px;
+            position: relative
+        }
+
+        .disclaimer-section li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold
+        }
+
+        .disclaimer-section li strong {
+            color: var(--accent-pink)
+        }
+
+        .disclaimer-advice {
+            display: flex;
+            gap: 14px;
+            margin-top: 24px;
+            padding: 18px;
+            background: rgba(52, 211, 153, .06);
+            border: 1px solid rgba(52, 211, 153, .2);
+            border-radius: var(--radius-md)
+        }
+
+        .disclaimer-advice-icon {
+            font-size: 28px;
+            flex-shrink: 0
+        }
+
+        .disclaimer-advice h4 {
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 6px
+        }
+
+        .disclaimer-advice p {
+            font-size: .82rem;
+            color: var(--text-secondary);
+            line-height: 1.7
+        }
+
+        .disclaimer-advice strong {
+            color: var(--accent-green)
+        }
+
+        /* Review */
+        .review-section {
+            width: 100%;
+            text-align: left;
+            margin-top: 28px
+        }
+
+        .review-block {
+            margin-bottom: 24px
+        }
+
+        .review-block-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 6px
+        }
+
+        .review-block-title.incorrect-title {
+            color: var(--accent-red)
+        }
+
+        .review-block-title.correct-title {
+            color: var(--accent-green)
+        }
+
+        .review-block-subtitle {
+            font-size: .8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px
+        }
+
+        .review-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            margin-bottom: 10px;
+            animation: fadeInUp .3s ease-out both
+        }
+
+        .review-item.incorrect {
+            border-left: 3px solid var(--accent-red)
+        }
+
+        .review-item.correct {
+            border-left: 3px solid var(--accent-green)
+        }
+
+        .review-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px
+        }
+
+        .review-q-num {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--accent-cyan)
+        }
+
+        .review-badge-wrong {
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--accent-red);
+            background: rgba(251, 113, 133, .12);
+            padding: 3px 10px;
+            border-radius: 50px
+        }
+
+        .review-badge-ok {
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            background: rgba(52, 211, 153, .12);
+            padding: 3px 10px;
+            border-radius: 50px
+        }
+
+        .review-q-text {
+            font-size: .88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 10px
+        }
+
+        .review-answer-row {
+            margin-bottom: 6px
+        }
+
+        .review-your-answer {
+            font-size: .82rem;
+            color: var(--text-secondary)
+        }
+
+        .review-your-answer.wrong {
+            color: var(--accent-red)
+        }
+
+        .review-correct-answer {
+            font-size: .82rem;
+            color: var(--accent-green);
+            font-weight: 600
+        }
+
+        .review-explanation {
+            font-size: .8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-subtle)
+        }
+
+        .review-page {
+            font-size: .75rem;
+            color: var(--text-muted);
+            margin-top: 6px
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            20% {
+                transform: translateX(-8px)
+            }
+
+            40% {
+                transform: translateX(8px)
+            }
+
+            60% {
+                transform: translateX(-6px)
+            }
+
+            80% {
+                transform: translateX(4px)
+            }
+        }
+
+        @keyframes pop-in {
+            0% {
+                transform: scale(0);
+                opacity: 0
+            }
+
+            60% {
+                transform: scale(1.2)
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 8px var(--accent-cyan-glow))
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px var(--accent-cyan-glow))
+            }
+        }
+
+        @keyframes slide-in-choice {
+            from {
+                opacity: 0;
+                transform: translateX(-20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        /* Responsive */
+        @media(max-width:600px) {
+
+            .file-select h1,
+            .intro h1 {
+                font-size: 1.6rem
+            }
+
+            .mode-card {
+                padding: 20px 16px
+            }
+
+            .question-card {
+                padding: 24px 20px
+            }
+
+            .question-text {
+                font-size: .95rem
+            }
+
+            .choice-btn {
+                padding: 14px 16px;
+                font-size: .85rem
+            }
+
+            .result-card {
+                padding: 32px 20px
+            }
+
+            .stats-grid {
+                gap: 8px
+            }
+
+            .disclaimer-card {
+                padding: 24px 18px
+            }
+
+            .disclaimer-section-header h3 {
+                font-size: .85rem
+            }
+
+            .review-item {
+                padding: 14px 16px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Screen: File Select -->
+        <div id="screen-file" class="screen active">
+            <div class="file-select">
+                <div class="logo-icon">📂</div>
+                <h1>クイズアプリ v2</h1>
+                <p class="subtitle">CSVファイルを読み込んでクイズを開始しよう！</p>
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" accept=".csv">
+                    <div class="drop-icon">📄</div>
+                    <div class="drop-text">CSVファイルを選択またはドラッグ＆ドロップ</div>
+                    <div class="drop-hint">対応形式：通し番号,問題文,選択肢1〜4,正解,解説,教科書参照ページ</div>
+                </div>
+                <div id="errorMsg" class="error-msg"></div>
+                <div class="csv-format-hint">
+                    <h3>💡 CSVファイルの形式</h3>
+                    <code>通し番号,問題文,選択肢1,選択肢2,選択肢3,選択肢4,正解,解説,教科書参照ページ</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen: Intro -->
+        <div id="screen-intro" class="screen">
+            <div class="intro">
+                <div class="logo-icon">🚀</div>
+                <h1 id="quizTitle"></h1>
+                <p class="subtitle" id="quizSubtitle"></p>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="card-icon">📚</div>
+                        <div class="card-label">問題数</div>
+                        <div class="card-value" id="totalCount">0</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🎯</div>
+                        <div class="card-label">形式</div>
+                        <div class="card-value">4択</div>
+                    </div>
+                </div>
+                <div class="disclaimer-banner" onclick="showScreen('disclaimer')">
+                    <div class="disclaimer-banner-icon">⚠️</div>
+                    <div class="disclaimer-banner-text">
+                        <strong>はじめに必ずお読みください</strong><span>この問題集はAIで作成されている場合があります。利用上の注意事項を確認してから始めましょう。</span>
+                    </div>
+                    <div class="disclaimer-banner-arrow">→</div>
+                </div>
+                <div class="mode-cards">
+                    <div class="mode-card">
+                        <div class="mode-card-header"><span class="mode-icon">🎲</span>
+                            <h3>ランダム10問</h3>
+                        </div>
+                        <p class="mode-desc">全問題の中からランダムで10問を出題。サクッと復習したい時に！</p>
+                        <div class="mode-meta"><span>📚 10問</span><span>⏱ 約5分</span></div>
+                        <button class="start-btn" onclick="startRandom()">チャレンジ開始 ⚡</button>
+                    </div>
+                    <div class="mode-card">
+                        <div class="mode-card-header"><span class="mode-icon">📖</span>
+                            <h3>全問チャレンジ</h3>
+                        </div>
+                        <p class="mode-desc" id="seqDesc">全問を順番に解く！しっかり対策したい時に。途中からも開始できます。</p>
+                        <div class="mode-meta"><span id="seqCount">📚 50問</span><span id="seqTime">⏱ 約25分</span></div>
+                        <div class="seq-start-picker">
+                            <label for="seqStart">開始問題番号：</label>
+                            <select id="seqStart"></select>
+                        </div>
+                        <button class="start-btn sequential" onclick="startSequential()">スタート 📝</button>
+                    </div>
+                </div>
+                <button class="change-csv-btn" id="changeCsvBtn" onclick="showScreen('file')">📂 別のCSVファイルを選択</button>
+            </div>
+        </div>
+
+        <!-- Screen: Disclaimer -->
+        <div id="screen-disclaimer" class="screen">
+            <div class="disclaimer">
+                <button class="back-btn" onclick="showScreen('intro')">← トップに戻る</button>
+                <div class="disclaimer-card">
+                    <h2 class="disclaimer-title">⚠️ 対策問題の利用にあたって</h2>
+                    <p class="disclaimer-lead">
+                        この問題集は、学習の補助として<strong>生成AIを用いて作成されたもの</strong>である場合があります。<br>活用する際は、以下の注意事項を必ず読み、<strong>批判的な視点</strong>を持って取り組んでください。
+                    </p>
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header"><span class="disclaimer-num">1</span>
+                            <h3>「ハルシネーション（もっともらしい嘘）」への注意</h3>
+                        </div>
+                        <ul>
+                            <li>生成AIは、時として事実とは異なる情報を、あたかも正しいかのように出力する「ハルシネーション」を起こすことがあります。</li>
+                            <li><strong>解答や解説が100%正確である保証はありません。</strong>疑問に思った点は、必ず教科書・授業プリントの該当ページを確認してください。</li>
+                        </ul>
+                    </div>
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header"><span class="disclaimer-num">2</span>
+                            <h3>試験範囲外の問題が含まれる可能性</h3>
+                        </div>
+                        <ul>
+                            <li>AIの判断により、授業で扱っていない内容や試験範囲外の高度な知識が含まれている可能性があります。</li>
+                            <li>AIが作成した問題だけに頼るのではなく、<strong>授業課題やフォームの復習</strong>も並行して行ってください。</li>
+                        </ul>
+                    </div>
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header"><span class="disclaimer-num">3</span>
+                            <h3>用語と定義の再確認</h3>
+                        </div>
+                        <ul>
+                            <li>AIが使用している用語が、授業での説明と微妙に異なる場合があるため、<strong>教科書の定義を優先して覚えてください</strong>。</li>
+                        </ul>
+                    </div>
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header"><span class="disclaimer-num">4</span>
+                            <h3>情報の信憑性を判断する力の養成</h3>
+                        </div>
+                        <ul>
+                            <li>この問題集を解くこと自体を、<strong>「情報の信憑性をクロスチェックする」</strong>ためのトレーニングとして活用してください。</li>
+                        </ul>
+                    </div>
+                    <div class="disclaimer-section">
+                        <div class="disclaimer-section-header"><span class="disclaimer-num">5</span>
+                            <h3>著作権への配慮</h3>
+                        </div>
+                        <ul>
+                            <li>この問題集を<strong>SNS等へ無断で転載・公開することは控えてください</strong>。</li>
+                        </ul>
+                    </div>
+                    <div class="disclaimer-advice">
+                        <div class="disclaimer-advice-icon">💡</div>
+                        <div>
+                            <h4>学習のアドバイス</h4>
+                            <p>この問題集で自分の苦手な分野を特定したら、その周辺の教科書の内容を読み込むことで、より確実な対策が可能になります。</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="back-btn bottom" onclick="showScreen('intro')">← トップに戻る</button>
+            </div>
+        </div>
+
+        <!-- Screen: Quiz -->
+        <div id="screen-quiz" class="screen">
+            <div class="quiz" id="quizArea"></div>
+        </div>
+
+        <!-- Screen: Result -->
+        <div id="screen-result" class="screen">
+            <div class="result" id="resultArea"></div>
+        </div>
+
+        <!-- Screen: Loading -->
+        <div id="screen-loading" class="screen">
+            <div class="loading-screen">
+                <div class="logo-icon">📚</div>
+                <h2>問題を読み込んでいます...</h2>
+                <div class="spinner"></div>
+                <p class="loading-text" id="loadingText">CSVファイルを取得中</p>
+                <div id="loadingError" class="error-msg" style="margin-top:24px"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ======== State ======== */
+        let allQuestions = [];
+        let quizQuestions = [];
+        let quizTitle = '';
+        let currentIdx = 0;
+        let score = 0;
+        let answered = false;
+        let selectedChoice = null;
+        let answersLog = [];
+        let quizMode = 'random';
+        let seqStartNum = 1;
+        const LABELS = ['A', 'B', 'C', 'D'];
+
+        /* ======== Screen Management ======== */
+        function showScreen(name) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + name).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ======== CSV Loading ======== */
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const errorMsg = document.getElementById('errorMsg');
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) loadCSV(file);
+        });
+        fileInput.addEventListener('change', e => { if (e.target.files[0]) loadCSV(e.target.files[0]); });
+
+        function loadCSV(file) {
+            if (!file.name.endsWith('.csv')) { showError('CSVファイルを選択してください。'); return; }
+            quizTitle = file.name.replace(/\.csv$/i, '');
+            const reader = new FileReader();
+            reader.onload = e => parseCSV(e.target.result);
+            reader.onerror = () => showError('ファイルの読み込みに失敗しました。');
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function parseCSV(text) {
+            const result = Papa.parse(text, { header: false, skipEmptyLines: true });
+            if (result.errors.length > 0) { showError('CSVの解析に失敗しました: ' + result.errors[0].message); return; }
+            const rows = result.data;
+            if (rows.length < 2) { showError('問題データが見つかりません。ヘッダー行と1問以上のデータが必要です。'); return; }
+            // Skip header row
+            const questions = [];
+            for (let i = 1; i < rows.length; i++) {
+                const r = rows[i];
+                if (r.length < 9) continue;
+                questions.push({
+                    id: parseInt(r[0]) || i,
+                    question: r[1],
+                    choices: [r[2], r[3], r[4], r[5]],
+                    answer: parseInt(r[6]),
+                    explanation: r[7],
+                    page: r[8]
+                });
+            }
+            if (questions.length === 0) { showError('有効な問題データが見つかりませんでした。CSV形式を確認してください。'); return; }
+            allQuestions = questions;
+            hideError();
+            setupIntro();
+            showScreen('intro');
+        }
+
+        function showError(msg) { errorMsg.textContent = msg; errorMsg.classList.add('show'); }
+        function hideError() { errorMsg.classList.remove('show'); }
+
+        /* ======== Auto-load from URL query parameter ======== */
+        let loadedFromUrl = false;
+
+        function autoLoadFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const csvParam = params.get('csv');
+            if (!csvParam) return; // No csv param, show file picker
+
+            loadedFromUrl = true;
+            showScreen('loading');
+            document.getElementById('loadingText').textContent = csvParam + ' を取得中...';
+
+            // Derive title from filename
+            const fileName = csvParam.split('/').pop();
+            quizTitle = fileName.replace(/\.csv$/i, '');
+
+            fetch(csvParam)
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status + ': ファイルが見つかりません');
+                    return res.text();
+                })
+                .then(text => {
+                    parseCSV(text);
+                    // Hide "change CSV" button when loaded from URL
+                    document.getElementById('changeCsvBtn').style.display = 'none';
+                })
+                .catch(err => {
+                    const loadErr = document.getElementById('loadingError');
+                    loadErr.textContent = 'CSVの読み込みに失敗しました: ' + err.message;
+                    loadErr.classList.add('show');
+                    document.getElementById('loadingText').textContent = '読み込みエラー';
+                });
+        }
+
+        // Run auto-load on page load
+        autoLoadFromUrl();
+
+        /* ======== Intro Setup ======== */
+        function setupIntro() {
+            document.getElementById('quizTitle').textContent = quizTitle;
+            const total = allQuestions.length;
+            document.getElementById('quizSubtitle').textContent = '全' + total + '問の中からチャレンジしよう！';
+            document.getElementById('totalCount').textContent = total + '問';
+            document.getElementById('seqCount').textContent = '📚 ' + total + '問';
+            const minutes = Math.max(1, Math.round(total * 0.5));
+            document.getElementById('seqTime').textContent = '⏱ 約' + minutes + '分';
+            // Populate start picker
+            const sel = document.getElementById('seqStart');
+            sel.innerHTML = '';
+            for (let i = 1; i <= total; i++) {
+                const opt = document.createElement('option');
+                opt.value = i; opt.textContent = '第' + i + '問から';
+                sel.appendChild(opt);
+            }
+            document.title = quizTitle + ' - クイズアプリ';
+        }
+
+        /* ======== Quiz Start ======== */
+        function pickRandom(arr, n) {
+            const s = [...arr].sort(() => Math.random() - 0.5);
+            return s.slice(0, Math.min(n, s.length));
+        }
+
+        function startRandom() {
+            quizMode = 'random';
+            quizQuestions = pickRandom(allQuestions, 10);
+            startQuiz();
+        }
+
+        function startSequential() {
+            quizMode = 'sequential';
+            seqStartNum = parseInt(document.getElementById('seqStart').value);
+            quizQuestions = allQuestions.slice(seqStartNum - 1);
+            startQuiz();
+        }
+
+        function startQuiz() {
+            currentIdx = 0; score = 0; answered = false; selectedChoice = null; answersLog = [];
+            renderQuestion();
+            showScreen('quiz');
+        }
+
+        /* ======== Quiz Rendering ======== */
+        function renderQuestion() {
+            const q = quizQuestions[currentIdx];
+            const total = quizQuestions.length;
+            const displayNum = quizMode === 'sequential' ? seqStartNum + currentIdx : currentIdx + 1;
+            const progressPct = (currentIdx / total) * 100;
+            const area = document.getElementById('quizArea');
+            area.innerHTML = `
+    <div class="quiz-header">
+      <div class="question-counter">Q <span>${currentIdx + 1}</span> / ${total}</div>
+      <div class="score-badge">✅ <span class="score-val">${score}</span> 正解</div>
+    </div>
+    <div class="progress-bar-wrapper"><div class="progress-bar-fill" style="width:${progressPct}%"></div></div>
+    <div class="question-card">
+      <div class="question-number-badge">📖 問題 ${displayNum}</div>
+      <p class="question-text">${escapeHtml(q.question)}</p>
+    </div>
+    <div class="choices-list" id="choicesList">
+      ${q.choices.map((c, i) => `
+        <button class="choice-btn" data-idx="${i + 1}" onclick="handleSelect(${i + 1})">
+          <span class="choice-label">${LABELS[i]}</span>
+          <span>${escapeHtml(c)}</span>
+        </button>
+      `).join('')}
+    </div>
+    <div id="feedbackArea"></div>
+    <div id="nextBtnArea"></div>
+  `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function handleSelect(choiceIdx) {
+            if (answered) return;
+            answered = true;
+            selectedChoice = choiceIdx;
+            const q = quizQuestions[currentIdx];
+            const correct = choiceIdx === q.answer;
+            if (correct) {
+                score++;
+                confetti({ particleCount: 60, spread: 55, origin: { y: 0.7 }, colors: ['#22d3ee', '#34d399', '#a78bfa'], disableForReducedMotion: true });
+            }
+            answersLog.push({ question: q, selected: choiceIdx, correct });
+            // Update choices
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                const idx = parseInt(btn.dataset.idx);
+                btn.disabled = true;
+                if (idx === q.answer) btn.classList.add('correct');
+                else if (idx === choiceIdx) btn.classList.add('incorrect');
+            });
+            // Update score badge
+            document.querySelector('.score-val').textContent = score;
+            // Update progress
+            const pct = ((currentIdx + 1) / quizQuestions.length) * 100;
+            document.querySelector('.progress-bar-fill').style.width = pct + '%';
+            // Feedback
+            document.getElementById('feedbackArea').innerHTML = `
+    <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+      <div class="feedback-header">
+        <span class="feedback-icon">${correct ? '🎉' : '💡'}</span>
+        <span class="feedback-title">${correct ? '正解！すばらしい！' : '残念！不正解…'}</span>
+      </div>
+      <p class="feedback-explanation">${escapeHtml(q.explanation)}</p>
+      <p class="feedback-page">📖 教科書 ${escapeHtml(q.page)}</p>
+    </div>
+  `;
+            // Next button
+            const isLast = currentIdx + 1 >= quizQuestions.length;
+            document.getElementById('nextBtnArea').innerHTML = `
+    <button class="next-btn" onclick="handleNext()">${isLast ? '結果を見る 🏆' : '次の問題へ →'}</button>
+  `;
+        }
+
+        function handleNext() {
+            if (currentIdx + 1 >= quizQuestions.length) {
+                showResult();
+            } else {
+                currentIdx++;
+                answered = false;
+                selectedChoice = null;
+                renderQuestion();
+            }
+        }
+
+        /* ======== Result ======== */
+        function showResult() {
+            const total = quizQuestions.length;
+            const pct = Math.round((score / total) * 100);
+            const circ = 2 * Math.PI * 76;
+            const offset = circ - (pct / 100) * circ;
+            let rank;
+            if (pct === 100) rank = { icon: '👑', title: '情報マスター', cls: 'excellent', msg: '完璧です！あなたは情報の達人！自信を持って本番に臨みましょう！' };
+            else if (pct >= 80) rank = { icon: '🌟', title: 'エキスパート', cls: 'excellent', msg: '素晴らしい成績です！あと少しで満点です。間違えた問題を復習すれば本番は万全です！' };
+            else if (pct >= 60) rank = { icon: '💪', title: 'チャレンジャー', cls: 'good', msg: 'いい調子です！下の復習リストで間違えた問題を確認しましょう！' };
+            else if (pct >= 40) rank = { icon: '📖', title: 'ルーキー', cls: 'ok', msg: 'まだまだ伸びしろがあります！下の復習リストと教科書で確認しましょう！' };
+            else rank = { icon: '🔥', title: 'スタート地点', cls: 'ok', msg: '焦らず一歩ずつ！下の復習リストで弱点を確認し、教科書を読み直しましょう！' };
+
+            const incorrectAnswers = answersLog.filter(a => !a.correct);
+            const correctAnswers = answersLog.filter(a => a.correct);
+
+            let reviewHtml = '<div class="review-section">';
+            if (incorrectAnswers.length > 0) {
+                reviewHtml += `<div class="review-block"><h3 class="review-block-title incorrect-title">❌ 不正解の問題（${incorrectAnswers.length}問）</h3><p class="review-block-subtitle">しっかり復習しよう！</p>`;
+                incorrectAnswers.forEach(a => {
+                    reviewHtml += `<div class="review-item incorrect"><div class="review-item-header"><span class="review-q-num">問${a.question.id}</span><span class="review-badge-wrong">不正解</span></div><p class="review-q-text">${escapeHtml(a.question.question)}</p><div class="review-answer-row"><span class="review-your-answer wrong">あなたの回答：${LABELS[a.selected - 1]}. ${escapeHtml(a.question.choices[a.selected - 1])}</span></div><div class="review-answer-row"><span class="review-correct-answer">正解：${LABELS[a.question.answer - 1]}. ${escapeHtml(a.question.choices[a.question.answer - 1])}</span></div><p class="review-explanation">${escapeHtml(a.question.explanation)}</p><p class="review-page">📖 教科書 ${escapeHtml(a.question.page)}</p></div>`;
+                });
+                reviewHtml += '</div>';
+            }
+            if (correctAnswers.length > 0) {
+                reviewHtml += `<div class="review-block"><h3 class="review-block-title correct-title">✅ 正解の問題（${correctAnswers.length}問）</h3>`;
+                correctAnswers.forEach(a => {
+                    reviewHtml += `<div class="review-item correct"><div class="review-item-header"><span class="review-q-num">問${a.question.id}</span><span class="review-badge-ok">正解</span></div><p class="review-q-text">${escapeHtml(a.question.question)}</p><div class="review-answer-row"><span class="review-correct-answer">${LABELS[a.question.answer - 1]}. ${escapeHtml(a.question.choices[a.question.answer - 1])}</span></div><p class="review-explanation">${escapeHtml(a.question.explanation)}</p><p class="review-page">📖 教科書 ${escapeHtml(a.question.page)}</p></div>`;
+                });
+                reviewHtml += '</div>';
+            }
+            reviewHtml += '</div>';
+
+            document.getElementById('resultArea').innerHTML = `
+    <div class="result-card">
+      <div class="result-icon">${rank.icon}</div>
+      <h2 class="result-title ${rank.cls}">${rank.title}</h2>
+      <p class="result-subtitle">あなたの成績をチェック！</p>
+      <div class="score-ring-container"><div class="score-ring">
+        <svg width="180" height="180"><circle cx="90" cy="90" r="76" fill="none" stroke-width="10" class="ring-bg"/><circle cx="90" cy="90" r="76" fill="none" stroke-width="10" class="ring-fill ${rank.cls}" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/></svg>
+        <div class="score-center"><div class="score-number">${pct}%</div><div class="score-label">正答率</div></div>
+      </div></div>
+      <div class="stats-grid">
+        <div class="stat-item correct-stat"><div class="stat-icon">✅</div><div class="stat-value">${score}</div><div class="stat-label">正解</div></div>
+        <div class="stat-item incorrect-stat"><div class="stat-icon">❌</div><div class="stat-value">${total - score}</div><div class="stat-label">不正解</div></div>
+        <div class="stat-item rate-stat"><div class="stat-icon">📊</div><div class="stat-value">${score}/${total}</div><div class="stat-label">スコア</div></div>
+      </div>
+      <div class="encouragement">${rank.msg}</div>
+    </div>
+    ${reviewHtml}
+    <div class="result-actions">
+      <button class="retry-btn" onclick="handleRetry()">🔄 もう一度チャレンジ</button>
+      <button class="home-btn" onclick="showScreen('intro')">🏠 トップに戻る</button>
+    </div>
+  `;
+            showScreen('result');
+            if (pct >= 80) {
+                const end = Date.now() + 2000;
+                const colors = ['#fbbf24', '#fb923c', '#22d3ee', '#a78bfa', '#34d399'];
+                (function frame() {
+                    confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors });
+                    confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                })();
+            }
+        }
+
+        function handleRetry() {
+            if (quizMode === 'random') quizQuestions = pickRandom(allQuestions, 10);
+            else quizQuestions = allQuestions.slice(seqStartNum - 1);
+            startQuiz();
+        }
+    </script>
+</body>
+
+</html>
