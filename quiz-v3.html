@@ -714,7 +714,8 @@
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all .3s ease;
-            box-shadow: 0 4px 16px var(--accent-cyan-glow)
+            box-shadow: 0 4px 16px var(--accent-cyan-glow);
+            margin-bottom: 32px
         }
 
         .next-btn:hover {
@@ -1511,6 +1512,7 @@
 
         .overall-explanation {
             margin-top: 16px;
+            margin-bottom: 20px;
             padding: 16px;
             background: rgba(34, 211, 238, .06);
             border: 1px solid rgba(34, 211, 238, .2);
@@ -2273,11 +2275,11 @@
 
                 const nextArea = document.getElementById('feedbackArea');
                 if (nextArea) {
-                    nextArea.innerHTML = `<button class="next-btn" id="nextBtn" onclick="handleNextQuestion()">${currentQIdx + 1 >= total ? '結果を見る 🏆' : '次の大問へ →'}</button>`;
-                    // Auto-scroll to Next button (Feature #6)
+                    nextArea.innerHTML = `<button class="next-btn" id="nextBtn" onclick="handleNextQuestion()">${currentQIdx + 1 >= total ? '結果を見る 🏆' : '次の大問へ →'}</button><div id="scrollAnchor" style="height:1px"></div>`;
+                    // Auto-scroll to anchor below Next button (Feature #6)
                     setTimeout(() => {
-                        const btn = document.getElementById('nextBtn');
-                        if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                        const anchor = document.getElementById('scrollAnchor');
+                        if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
                     }, 200);
                 }
             }
