@@ -219,6 +219,7 @@
         <input id="inputArray" type="text" value="5,3,8,4,2">
         <button id="prepareBtn">準備</button>
         <button id="nextBtn" disabled>次のステップ</button>
+        <button id="prevBtn" disabled>前のステップ</button>
         <button id="resetBtn">リセット</button>
 
         <!-- ★ 昇順・降順選択 -->
@@ -278,6 +279,7 @@
         const inputEl = document.getElementById("inputArray");
         const prepareBtn = document.getElementById("prepareBtn");
         const nextBtn = document.getElementById("nextBtn");
+        const prevBtn = document.getElementById("prevBtn");
         const resetBtn = document.getElementById("resetBtn");
         const orderSelect = document.getElementById("orderSelect");
         const directionRightRadio = document.getElementById("directionRight");
@@ -307,6 +309,23 @@
 
         let tempGhost = null;
         let rightGhost = null;
+
+        let historyStack = [];
+        let currentTimeout = null;
+
+        function lockButtons() {
+            nextBtn.disabled = true;
+            prevBtn.disabled = true;
+            prepareBtn.disabled = true;
+            resetBtn.disabled = true;
+        }
+
+        function unlockButtons() {
+            nextBtn.disabled = finished;
+            prevBtn.disabled = historyStack.length === 0;
+            prepareBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
 
         function log(msg) {
             logEl.textContent += msg + "\n";
@@ -431,12 +450,16 @@
             tempGhost = null;
             rightGhost = null;
 
+            if (currentTimeout) { clearTimeout(currentTimeout); currentTimeout = null; }
+            historyStack = [];
+
             chartEl.innerHTML = "";
             tempBox.textContent = "空";
             nextActionEl.textContent = "「準備」を押してください。";
             currentActionEl.textContent = "まだ何もしていません。";
             logEl.textContent = "";
             nextBtn.disabled = true;
+            prevBtn.disabled = true;
         }
 
         function prepare() {
@@ -477,6 +500,8 @@
 
         function nextStep() {
             if (finished) return;
+
+            saveState();
 
             if (direction === "right") {
                 nextStepRight();
@@ -526,6 +551,12 @@
 
                 phase = "copyRightToLeft";
                 nextActionEl.textContent = "次：右の値を左にコピーします。";
+
+                lockButtons();
+                currentTimeout = setTimeout(() => {
+                    unlockButtons();
+                    currentTimeout = null;
+                }, 600);
                 return;
             }
 
@@ -535,15 +566,18 @@
 
                 moveGhostToBar(rightGhost, wrappers[j]);
 
-                setTimeout(() => {
+                lockButtons();
+                currentTimeout = setTimeout(() => {
                     arr[j] = b;
                     bars[j].style.height = (b * currentBarUnit) + "px";
                     bars[j].textContent = b;
-                    rightGhost.remove();
-                    rightGhost = null;
-                }, 600);
-
-                currentActionEl.textContent = `a[j] = a[j+1] として左にコピーしました。`;
+                    if (rightGhost) {
+                        rightGhost.remove();
+                        rightGhost = null;
+                    }
+                    unlockButtons();
+                    currentTimeout = null;
+                }, 600); currentActionEl.textContent = `a[j] = a[j+1] として左にコピーしました。`;
                 // log(`左に ${b} をコピー`);
 
                 phase = "tempToRight";
@@ -556,16 +590,19 @@
 
                 moveGhostToBar(tempGhost, wrappers[j + 1]);
 
-                setTimeout(() => {
+                lockButtons();
+                currentTimeout = setTimeout(() => {
                     arr[j + 1] = tempValue;
                     bars[j + 1].style.height = (tempValue * currentBarUnit) + "px";
                     bars[j + 1].textContent = tempValue;
 
-                    tempGhost.remove();
-                    tempGhost = null;
-                }, 600);
-
-                currentActionEl.textContent = `a[j+1] = temp として右にコピーしました。`;
+                    if (tempGhost) {
+                        tempGhost.remove();
+                        tempGhost = null;
+                    }
+                    unlockButtons();
+                    currentTimeout = null;
+                }, 600); currentActionEl.textContent = `a[j+1] = temp として右にコピーしました。`;
                 // log(`右に temp をコピー → [${arr.join(", ")}]`);
 
                 phase = "advance";
@@ -666,15 +703,18 @@
                 rightGhost = createGhost(bars[rightIndex], b);
                 moveGhostToBar(rightGhost, wrappers[leftIndex]);
 
-                setTimeout(() => {
+                lockButtons();
+                currentTimeout = setTimeout(() => {
                     arr[leftIndex] = b;
                     bars[leftIndex].style.height = (b * currentBarUnit) + "px";
                     bars[leftIndex].textContent = b;
-                    rightGhost.remove();
-                    rightGhost = null;
-                }, 600);
-
-                currentActionEl.textContent = `a[${leftIndex}] = a[${rightIndex}] として左にコピーしました。`;
+                    if (rightGhost) {
+                        rightGhost.remove();
+                        rightGhost = null;
+                    }
+                    unlockButtons();
+                    currentTimeout = null;
+                }, 600); currentActionEl.textContent = `a[${leftIndex}] = a[${rightIndex}] として左にコピーしました。`;
                 // log(`左に ${b} をコピー`);
 
                 phase = "tempToRight";
@@ -685,16 +725,19 @@
             if (phase === "tempToRight") {
                 moveGhostToBar(tempGhost, wrappers[rightIndex]);
 
-                setTimeout(() => {
+                lockButtons();
+                currentTimeout = setTimeout(() => {
                     arr[rightIndex] = tempValue;
                     bars[rightIndex].style.height = (tempValue * currentBarUnit) + "px";
                     bars[rightIndex].textContent = tempValue;
 
-                    tempGhost.remove();
-                    tempGhost = null;
-                }, 600);
-
-                currentActionEl.textContent = `a[${rightIndex}] = temp として右にコピーしました。`;
+                    if (tempGhost) {
+                        tempGhost.remove();
+                        tempGhost = null;
+                    }
+                    unlockButtons();
+                    currentTimeout = null;
+                }, 600); currentActionEl.textContent = `a[${rightIndex}] = temp として右にコピーしました。`;
                 // log(`右に temp をコピー → [${arr.join(", ")}]`);
 
                 phase = "advance";
@@ -742,8 +785,69 @@
             }
         }
 
+        function saveState() {
+            historyStack.push({
+                arr: [...arr],
+                i, j, n, sortedBoundary, finished, direction, phase, needSwap, tempValue, currentBarUnit,
+                logHTML: logEl.innerHTML,
+                nextActionText: nextActionEl.innerHTML,
+                currentActionText: currentActionEl.innerHTML,
+                tempBoxText: tempBox.textContent,
+                compareIndices: bars.map((b, idx) => b.classList.contains("compare") ? idx : -1).filter(idx => idx !== -1)
+            });
+            prevBtn.disabled = false;
+        }
+
+        function prevStep() {
+            if (historyStack.length === 0) return;
+            if (currentTimeout) { clearTimeout(currentTimeout); currentTimeout = null; }
+
+            const state = historyStack.pop();
+            arr = [...state.arr];
+            i = state.i;
+            j = state.j;
+            n = state.n;
+            sortedBoundary = state.sortedBoundary;
+            finished = state.finished;
+            direction = state.direction;
+            phase = state.phase;
+            needSwap = state.needSwap;
+            tempValue = state.tempValue;
+            currentBarUnit = state.currentBarUnit;
+
+            logEl.innerHTML = state.logHTML;
+            nextActionEl.innerHTML = state.nextActionText;
+            currentActionEl.innerHTML = state.currentActionText;
+            tempBox.textContent = state.tempBoxText;
+
+            if (tempGhost) { tempGhost.remove(); tempGhost = null; }
+            if (rightGhost) { rightGhost.remove(); rightGhost = null; }
+
+            renderBars();
+
+            state.compareIndices.forEach(idx => {
+                if (bars[idx]) bars[idx].classList.add("compare");
+            });
+
+            if (phase === "copyRightToLeft" || phase === "tempToRight") {
+                tempGhost = document.createElement("div");
+                tempGhost.className = "ghost";
+                tempGhost.textContent = tempValue;
+                tempGhost.style.height = (tempValue * currentBarUnit) + "px";
+                document.body.appendChild(tempGhost);
+                const t = tempBox.getBoundingClientRect();
+                const tempHeight = parseFloat(tempGhost.style.height);
+                tempGhost.style.left = (t.left + t.width / 2 - 40) + "px";
+                tempGhost.style.top = (t.top + t.height / 2 - tempHeight / 2) + "px";
+            }
+
+            unlockButtons();
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
         prepareBtn.addEventListener("click", prepare);
         nextBtn.addEventListener("click", nextStep);
+        prevBtn.addEventListener("click", prevStep);
         resetBtn.addEventListener("click", reset);
     </script>
 
