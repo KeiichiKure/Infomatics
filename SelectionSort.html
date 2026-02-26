@@ -357,6 +357,16 @@
         let historyStack = [];
         let currentTimeout = null;
 
+        function updateBarDisplay(el, v) {
+            const h = Math.max(v * currentBarUnit, 5);
+            el.style.height = h + "px";
+            if (v === 0) {
+                el.innerHTML = `<div style="position: absolute; top: -28px; width: 100%; color: #000; font-weight: bold;">0</div>`;
+            } else {
+                el.textContent = v;
+            }
+        }
+
         function lockButtons() {
             nextBtn.disabled = true;
             prevBtn.disabled = true;
@@ -391,8 +401,7 @@
 
                 const bar = document.createElement("div");
                 bar.className = "bar";
-                bar.style.height = (v * currentBarUnit) + "px";
-                bar.textContent = v;
+                updateBarDisplay(bar, v);
 
                 if (direction === "right") {
                     if (idx >= n - sortedBoundary) bar.classList.add("sorted");
@@ -435,8 +444,7 @@
             const rect = fromBar.getBoundingClientRect();
             const ghost = document.createElement("div");
             ghost.className = "ghost";
-            ghost.style.height = rect.height + "px";
-            ghost.textContent = value;
+            updateBarDisplay(ghost, value);
             ghost.style.left = rect.left + "px";
             ghost.style.top = rect.top + "px";
             document.body.appendChild(ghost);
@@ -524,7 +532,11 @@
             reset();
             const nums = inputEl.value.split(",").map(s => Number(s.trim()));
             if (nums.some(isNaN)) {
-                alert("数値をカンマ区切りで入力してください");
+                alert("数値を正しくカンマ区切りで入力してください");
+                return;
+            }
+            if (nums.some(n => n < 0)) {
+                alert("マイナスの値は設定できません。0以上の数値を入力してください。");
                 return;
             }
             arr = nums;
@@ -860,8 +872,7 @@
                 lockButtons();
                 currentTimeout = setTimeout(() => {
                     arr[fromIdx] = val;
-                    bars[fromIdx].style.height = (val * currentBarUnit) + "px";
-                    bars[fromIdx].textContent = val;
+                    updateBarDisplay(bars[fromIdx], val);
                     if (targetGhost) {
                         targetGhost.remove();
                         targetGhost = null;
@@ -880,8 +891,7 @@
                 lockButtons();
                 currentTimeout = setTimeout(() => {
                     arr[toIdx] = tempValue;
-                    bars[toIdx].style.height = (tempValue * currentBarUnit) + "px";
-                    bars[toIdx].textContent = tempValue;
+                    updateBarDisplay(bars[toIdx], tempValue);
                     if (tempGhost) {
                         tempGhost.remove();
                         tempGhost = null;
@@ -929,8 +939,7 @@
                 lockButtons();
                 currentTimeout = setTimeout(() => {
                     arr[idx1] = val;
-                    bars[idx1].style.height = (val * currentBarUnit) + "px";
-                    bars[idx1].textContent = val;
+                    updateBarDisplay(bars[idx1], val);
                     if (targetGhost) {
                         targetGhost.remove();
                         targetGhost = null;
@@ -947,8 +956,7 @@
                 lockButtons();
                 currentTimeout = setTimeout(() => {
                     arr[idx2] = tempValue;
-                    bars[idx2].style.height = (tempValue * currentBarUnit) + "px";
-                    bars[idx2].textContent = tempValue;
+                    updateBarDisplay(bars[idx2], tempValue);
                     if (tempGhost) {
                         tempGhost.remove();
                         tempGhost = null;
@@ -1064,8 +1072,7 @@
             if (phase === "copyToTarget" || phase === "tempToOrigin" || phase === "copyTo1" || phase === "tempTo2") {
                 tempGhost = document.createElement("div");
                 tempGhost.className = "ghost";
-                tempGhost.textContent = tempValue;
-                tempGhost.style.height = (tempValue * currentBarUnit) + "px";
+                updateBarDisplay(tempGhost, tempValue);
                 document.body.appendChild(tempGhost);
                 const t = tempBox.getBoundingClientRect();
                 const tempHeight = parseFloat(tempGhost.style.height);
